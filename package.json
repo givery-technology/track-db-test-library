@@ -1,0 +1,16 @@
+{
+  "name": "track-db-test-utility",
+  "version": "0.0.0",
+  "description": "Test utility for Track database challenges",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Givery.inc",
+  "license": "MIT",
+  "dependencies": {
+    "csvjson": "^5.1.0",
+    "knex": "^0.19.3",
+    "yaml": "^1.6.0"
+  }
+}
