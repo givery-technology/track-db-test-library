@@ -1,48 +1,50 @@
 # track-db-test-utility
 Test utility for Track database challenges
 
-## `db` module
+## Usage
+
+### `db` module
 
 Handles database connection for SQLite.
 
-### `db.Connection`
+#### `db.Connection`
 
 A wrapper class to utilize knex.
 
-#### `Connection#knex`
+#### `db.Connection#knex`
 
 Raw knex connection object.
 
-#### async `Connection#query(sql, opt_args)`
+#### async `db.Connection#query(sql, opt_args)`
 
 Queries a single SQL.
 
 ```javascript
-const employees = await conn.query("SELECT * AS count FROM emp");
+const employees = await _conn.query("SELECT * AS count FROM emp");
 employees.forEach(({empno, deptno, name}) => console.log(name));
 ```
 
-#### async `Connection#queryPlan(sql, opt_args)`
+#### async `db.Connection#queryPlan(sql, opt_args)`
 
 Queries execution plan for a single SQL.
 
 ```javascript
 // equivalent to:
 //   const plansForSelectEmployees = await conn.queryPlan("EXPLAIN QUERY PLAN SELECT * AS count FROM emp");
-const plansForSelectEmployees = await conn.queryPlan("SELECT * AS count FROM emp");
+const plansForSelectEmployees = await _conn.queryPlan("SELECT * AS count FROM emp");
 ```
 
-#### async `Connection#queryFromFile(path, opt_args)`
+#### async `db.Connection#queryFromFile(path, opt_args)`
 
 Queries SQLs from file.
 
 ```javascript
-const {sql, records} = await conn.queryFromFile("emp.sql")[0];
+const {sql, records} = await _conn.queryFromFile("emp.sql")[0];
 console.log(sql); // SELECT * AS count FROM emp
 records.forEach(({empno, deptno, name}) => console.log(name));
 ```
 
-#### async `Connection#queryPlansFromFile(path, opt_args)`
+#### async `db.Connection#queryPlansFromFile(path, opt_args)`
 
 Queries SQLs from file.
 
@@ -51,11 +53,11 @@ const {sql, records} = await conn.queryFromFile("emp.sql")[0];
 console.log(sql); // EXPLAIN QUERY PLAN SELECT * AS count FROM emp
 ```
 
-#### async `Connection#loadFromCSV(path, table)`
+#### async `db.Connection#loadFromCSV(path, table)`
 
 Loads records from CSV and inserts them into the given table
 
-### `format.records(records)`
+#### `db.format.records(records)`
 
 Format `records` as a table.
 
@@ -75,7 +77,7 @@ empno       deptno      name
 ----------  ----------  ----------
 ```
 
-### `format(message, sql, records)`
+#### `db.format(message, sql, records)`
 
 Format `records` with a message
 
@@ -100,7 +102,7 @@ empno       deptno      name
 ----------  ----------  ----------
 ```
 
-## `i18n` module
+### `i18n` module
 
 Supports internationalization.
 
@@ -122,11 +124,11 @@ console.log(_('[基本実装] SELECT 文で適切なレコードを取得でき�
 console.log(_`[基本実装] SELECT 文で適切なレコードを取得できる`);
 ```
 
-## `assertions` module
+### `assertions` module
 
 Introduces a new assertion to `chai.expect`.
 
-### `recordEqual(expected, opt_message)`
+#### `assertions.recordEqual(expected, opt_message)`
 
 Deep and fuzzy `equal` which ignores case of keys and ignores `string` / `number` type of values.
 
@@ -141,3 +143,7 @@ expect(
   [{ empno: 1, deptno: 10, name: "Scott" }]
 );
 ``` 
+
+## License
+
+This software is released under the [MIT License](LICENSE).
