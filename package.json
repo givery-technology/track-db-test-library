@@ -4,13 +4,27 @@
   "description": "Test utility for Track database challenges",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/givery-technology/track-db-test-library.git"
   },
   "author": "Givery Technology",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/givery-technology/track-db-test-library/issues"
+  },
   "dependencies": {
     "csvjson": "^5.1.0",
+    "diff": "^4.0.1",
+    "docopt": "^0.6.2",
     "knex": "^0.19.3",
     "yaml": "^1.6.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "gulp": "^4.0.2",
+    "gulp-mocha": "^7.0.1"
   }
 }

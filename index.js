@@ -1,6 +1,6 @@
 module.exports = {
-	Connection: require('./lib/connection.js'),
-	assertions: require('./lib/assertions.js'),
-	i18n: require('./lib/i18n.js'),
-	format: require('./lib/format.js'),
+	Connection: require('./lib/connection'),
+	assertions: require('./lib/assertions'),
+	i18n: require('./lib/i18n'),
+	records: require('./lib/records'),
 };

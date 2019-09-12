@@ -40,6 +40,9 @@ console.log(sql); // SELECT * AS count FROM emp
 records.forEach(({empno, deptno, name}) => console.log(name));
 ```
 
+Note that return value is an array of `{sql: string, records: array}`. 
+The given file may contain multiple queries. 
+
 #### async `Connection#queryPlansFromFile(path, opt_args)`
 
 Queries SQLs from file.
@@ -53,14 +56,69 @@ console.log(sql); // EXPLAIN QUERY PLAN SELECT * AS count FROM emp
 
 Loads records from CSV and inserts them into the given table
 
-### `format` module
-#### `format.records([message, sql,] records)`
+### `records` module
 
-Format `records` as a table.
+Utility for query result records
+
+#### `records.normailze(xs)`
+
+Normalizes each record of `xs` as follows:
+
+* Every keys are changed to lower case.
+* Every values are changed their type to `string`s, `boolean`s, or `null`.
+    + `String` (object) -> `string` (primitive type)
+    + `number` -> `string`
+    + ...
+* Record itself is converted to `object`
+    + `Map` -> `object`
+* `xs` is converted to `array`
+    + `Set`, Iterators -> `array`
+
+```javascript
+const input = [
+    {id: 1, NAME: 'NAME #1'},
+	{id: 'A', name: 'name #2'},
+];
+const normalized = records.normalize(input);
+// [ 
+//  {id: '1', name: 'NAME #1'},
+//  {id: 'A', name: 'name #2'},
+// ]
+```
+
+#### `records.diff(as, bs)`
+
+Diffs two records. Records will be normalized with `records.normailze()`
+Result have a two `Map`s for `as` and `bs`, which represents a lineno - columns pair.
+
+```javascript
+const as = [
+	{id: 'a', name: 'name #1', flag: true},
+	{id: 'b', name: 'name #2', flag: false},
+	{id: 'c', name: 'name #3', flag: false},
+];
+const bs = [
+	{id: 'a', name: 'name #1', flag: true},
+	{id: 'b', name: 'name #0', flag: true},
+	{id: 'c', name: 'name #3', flag: false},
+];
+// {
+//   a: new Map([
+//     [1, ['name', 'flag']] // `name` and `flag` values ('name #2', false) on line 1 are present only in `as`
+//   ]),
+//   b: new Map([
+//     [1, ['name', 'flag']] // `name` and `flag` values ('name #0', true)  on line 1 are present only in `bs`
+//   ]),
+// }
+```
+
+#### `records.format(xs, [option])`
+
+Format records `xs` as a table.
 
 ```javascript
 console.log(
-  format(
+  records.format(
       [{ empno: 1, deptno: 10, name: "Scott" }]
   )
 );
@@ -76,7 +134,7 @@ empno       deptno      name
 
 ```javascript
 console.log(
-  format(
+  records.format(
       'Employee tables',
       'SELECT * FROM emp',
       [{ empno: 1, deptno: 10, name: "Scott" }]
@@ -141,7 +199,66 @@ expect([
 ]);
 ``` 
 
-#### `fullscan`
+#### `recordEqualToCsv(path, opt_message)
+
+Target will be loaded from CSV file.
+
+
+```javascript
+expect([
+  { EMPNO: "1", DEPTNO: "10", NAME: "Scott" }
+]).to.recordEqualToCsv("emp.csv");
+``` 
+
+```csv
+empno,deptno,name
+1,10,Scott
+```
+
+#### `columns(xs)`
+
+Retains given column(s) from actual records (no assertion)
+
+```javascript
+expect([
+  { empno: 1, deptno: 10, name: "Scott" }
+])
+.columns(['deptno', 'name'])
+.to.recordEqual([
+  { deptno: 10, name: "Scott" }
+]);
+``` 
+
+#### `without(xs)`
+
+Removes given column(s) from actual records (no assertion)
+
+```javascript
+expect([
+  { empno: 1, deptno: 10, name: "Scott" }
+])
+.without('empno') // `.without(['empno'])` will also be accepted
+.to.recordEqual([
+  { deptno: 10, name: "Scott" }
+]);
+``` 
+
+#### `orderBy(xs)`
+
+Sort actual records by given columns.
+Records will be normalized.
+
+```javascript
+expect([
+  ...
+])
+.orderBy(['id', '-name']) // order by `id` (asc) and then `name` (desc)
+.to.recordEqual([
+  ...
+]);
+``` 
+
+#### `fullscan()`
 
 Checks if table full scan is planned to `Connection#queryPlan()` results.
 
