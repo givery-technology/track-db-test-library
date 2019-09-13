@@ -6,6 +6,9 @@
   "scripts": {
     "test": "gulp"
   },
+  "bin": {
+    "run-sql": "bin/run-sql.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/givery-technology/track-db-test-library.git"
@@ -20,6 +23,7 @@
     "diff": "^4.0.1",
     "docopt": "^0.6.2",
     "knex": "^0.19.3",
+    "sqlite3": "^4.0.7",
     "yaml": "^1.6.0"
   },
   "devDependencies": {

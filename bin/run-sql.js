@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/node
 
 const dblib = require('..');
 const { docopt } = require('docopt');
