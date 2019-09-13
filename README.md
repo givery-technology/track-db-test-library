@@ -26,7 +26,7 @@ Queries execution plan for a single SQL.
 
 ```javascript
 // equivalent to:
-//   const plansForSelectEmployees = await conn.queryPlan("EXPLAIN QUERY PLAN SELECT * AS count FROM emp");
+//   const plansForSelectEmployees = await conn.query("EXPLAIN QUERY PLAN SELECT * AS count FROM emp");
 const plansForSelectEmployees = await conn.queryPlan("SELECT * AS count FROM emp");
 ```
 
@@ -43,12 +43,12 @@ records.forEach(({empno, deptno, name}) => console.log(name));
 Note that return value is an array of `{sql: string, records: array}`. 
 The given file may contain multiple queries. 
 
-#### async `Connection#queryPlansFromFile(path, opt_args)`
+#### async `Connection#queryPlanFromFile(path, opt_args)`
 
 Queries SQLs from file.
 
 ```javascript
-const {sql, records} = await conn.queryFromFile("emp.sql")[0];
+const {sql, records} = await conn.queryPlanFromFile("emp.sql")[0];
 console.log(sql); // EXPLAIN QUERY PLAN SELECT * AS count FROM emp
 ```
 
