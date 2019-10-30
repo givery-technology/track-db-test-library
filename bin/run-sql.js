@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 const dblib = require('..');
 const { docopt } = require('docopt');
@@ -11,11 +11,12 @@ const usage = `
 Runs SQL
 
 Usage:
-  run-sql.js <preparation>...
+  run-sql.js [options] <preparation>...
   run-sql.js -h | --help
   
 Options:
-  -h --help   Show this screen.
+  -h --help            Show this screen.
+  -f --format FORMAT   Formatter to print records [pretty, csv; default: pretty]
 `;
 
 (async() => {
@@ -25,10 +26,7 @@ Options:
 		const sql = await promisify(fs.readFile)(process.stdin.fd, 'utf8');
 		await conn.prepare(preparation(args['<preparation>']));
 		const records = await conn.query(sql);
-		const msg = _`SQL execution result` +
-			`:\n${indent(sql)}\n\n${indent('') + records.length} ` +
-			_`row(s) selected` + `\n${indent(dblib.records.format(records))}`;
-		console.log(msg);
+		console.log(formatter(args['--format'])(records, sql));
 		process.exit(0);
 	} catch (e) {
 		console.error(e);
@@ -53,4 +51,14 @@ function preparation(preps) {
 
 function indent(str, n = 2) {
 	return str.split('\n').map(s => ' '.repeat(n) + s).join('\n');
+}
+
+function formatter(formatter) {
+	switch (formatter) {
+		case 'csv': return (records, sql) => dblib.records.toCSV(records);
+		default: return (records, sql) =>
+			_`SQL execution result` +
+			`:\n${indent(sql)}\n\n${indent('') + records.length} ` +
+			_`row(s) selected` + `\n${indent(dblib.records.format(records))}`;
+	}
 }
