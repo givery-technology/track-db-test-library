@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "csvjson": "^5.1.0",
-    "diff": "^4.0.1",
+    "diff-match-patch": "^1.0.4",
     "docopt": "^0.6.2",
     "knex": "^0.19.5",
     "sqlite3": "^4.0.7",
