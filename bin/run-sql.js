@@ -23,10 +23,15 @@ Options:
 	try {
 		let args = docopt(usage);
 		const conn = new dblib.Connection();
-		const sql = await promisify(fs.readFile)(process.stdin.fd, 'utf8');
 		await conn.prepare(preparation(args['<preparation>']));
-		const records = await conn.query(sql);
-		console.log(formatter(args['--format'])(records, sql));
+		const sqls = (await promisify(fs.readFile)(process.stdin.fd, 'utf8'))
+			.split(";")
+			.map(sql => sql.trim())
+			.filter(sql => sql.length > 0);
+		for (let sql of sqls) {
+			const records = await conn.query(sql);
+			console.log(formatter(args['--format'])(records, sql));
+		}
 		process.exit(0);
 	} catch (e) {
 		console.error(e);
