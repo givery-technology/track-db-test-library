@@ -148,5 +148,59 @@ describe('records module', () => {
 			expect(actual).to.eql(expected);
 		});
 
+		it('diffs for as which lack columns', () => {
+			const as = [
+				{id: 'a', name: 'name #1'},
+				{id: 'b', name: 'name #2'},
+				{id: 'c', name: 'name #3'},
+			];
+			const bs = [
+				{id: 'a', name: 'name #1', flag: true},
+				{id: 'b', name: 'name #2', flag: false},
+				{id: 'c', name: 'name #3', flag: false},
+			];
+			const expected = {
+				a: new Map([ // TODO: fix to make this empty
+					[0, ['flag']],
+					[1, ['flag']],
+					[2, ['flag']],
+				]),
+				b: new Map([
+					[0, ['flag']],
+					[1, ['flag']],
+					[2, ['flag']],
+				]),
+			};
+			const actual = diff(as, bs);
+			expect(actual).to.eql(expected);
+		});
+
+		it('diffs for bs which lack columns', () => {
+			const as = [
+				{id: 'a', name: 'name #1', flag: true},
+				{id: 'b', name: 'name #2', flag: false},
+				{id: 'c', name: 'name #3', flag: false},
+			];
+			const bs = [
+				{id: 'a', name: 'name #1'},
+				{id: 'b', name: 'name #2'},
+				{id: 'c', name: 'name #3'},
+			];
+			const expected = {
+				a: new Map([
+					[0, ['flag']],
+					[1, ['flag']],
+					[2, ['flag']],
+				]),
+				b: new Map([ // TODO: fix to make this empty
+					[0, ['flag']],
+					[1, ['flag']],
+					[2, ['flag']],
+				]),
+			};
+			const actual = diff(as, bs);
+			expect(actual).to.eql(expected);
+		});
+
 	});
 });
