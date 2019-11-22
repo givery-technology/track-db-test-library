@@ -21,4 +21,80 @@ describe('assertions module', () => {
 			]).to.fullscan(['tables', 'rooms']);
 		});
 	});
+
+	describe('columns()', () => {
+		it('should eliminate columns except for given ones in actual records', () => {
+			expect([
+				{a: 10, b: 20},
+				{a: 30, b: 40}
+			]).columns([
+				'a'
+			]).to.recordEqual([
+				{a: 10},
+				{a: 30}
+			])
+		});
+
+		it('should eliminate columns except for given ones in expected records', () => {
+			expect([
+				{a: 10},
+				{a: 30}
+			]).columns([
+				'a'
+			]).to.recordEqual([
+				{a: 10, b: 20},
+				{a: 30, b: 40}
+			])
+		});
+
+		it('should eliminate columns except for given ones both in expected and actual records', () => {
+			expect([
+				{a: 10, b:  20, c: 50},
+				{a: 30, b:  40, d: 60}
+			]).columns([
+				'a'
+			]).to.recordEqual([
+				{a: 10, b: -20, e: 70},
+				{a: 30, b: -40, f: 80}
+			])
+		});
+	});
+
+	describe('without()', () => {
+		it('should eliminate given columns in actual records', () => {
+			expect([
+				{a: 10, b: 20},
+				{a: 30, b: 40}
+			]).without([
+				'b'
+			]).to.recordEqual([
+				{a: 10},
+				{a: 30}
+			])
+		});
+
+		it('should eliminate given columns in expected records', () => {
+			expect([
+				{a: 10},
+				{a: 30}
+			]).without([
+				'b'
+			]).to.recordEqual([
+				{a: 10, b: 20},
+				{a: 30, b: 40}
+			])
+		});
+
+		it('should eliminate given columns both in expected and actual records', () => {
+			expect([
+				{a: 10, b:  20, c: 50},
+				{a: 30, b:  40, d: 60}
+			]).without([
+				'b', 'c', 'd', 'e', 'f'
+			]).to.recordEqual([
+				{a: 10, b: -20, e: 70},
+				{a: 30, b: -40, f: 80}
+			])
+		});
+	});
 });
