@@ -171,29 +171,34 @@ describe('records module', () => {
 			const rep = 1000;
 			for (let i = 0; i < rep; i++) {
 				as.push({
-					id: i,
-					name_a: `name-$i`
+					col1: i,
+					col2: i,
+					col3: `name-$i`,
+					col4: i,
+					col5: i,
 				});
 				bs.push({
-					id: i,
-					name_b: `name-$i`
+					col1: i,
+					col2: i,
+					col4: i,
+					col5: i,
 				});
 			}
 			const actual = diff(as, bs);
-			const expectedSummary = { a: {name_b: rep}, b: {name_a: rep} };
+			const expectedSummary = { a: {col3: rep}, b: {col3: rep} };
 			expect(summerize(actual)).to.eql(expectedSummary);
 		});
 
-    it('diffs for as which lack columns', () => {
+		it('diffs for as which lack columns', () => {
 			const as = [
 				{id: 'a', name: 'name #1'},
 				{id: 'b', name: 'name #2'},
 				{id: 'c', name: 'name #3'},
 			];
 			const bs = [
-				{id: 'a', name: 'name #1', flag: true},
-				{id: 'b', name: 'name #2', flag: false},
-				{id: 'c', name: 'name #3', flag: false},
+				{id: 'a', flag: true, name: 'name #1'},
+				{id: 'b', flag: false, name: 'name #2'},
+				{id: 'c', flag: false, name: 'name #3'},
 			];
 			const expected = {
 				a: new Map([ // TODO: fix to make this empty
@@ -208,14 +213,15 @@ describe('records module', () => {
 				]),
 			};
 			const actual = diff(as, bs);
-			expect(actual).to.eql(expected);
+			const expectedSummary = { a: {flag: 2}, b: {flag: 3} };
+			expect(summerize(actual)).to.eql(expectedSummary);
 		});
 
 		it('diffs for bs which lack columns', () => {
 			const as = [
-				{id: 'a', name: 'name #1', flag: true},
-				{id: 'b', name: 'name #2', flag: false},
-				{id: 'c', name: 'name #3', flag: false},
+				{id: 'a', flag: true, name: 'name #1'},
+				{id: 'b', flag: false, name: 'name #2'},
+				{id: 'c', flag: false, name: 'name #3'},
 			];
 			const bs = [
 				{id: 'a', name: 'name #1'},
@@ -235,7 +241,8 @@ describe('records module', () => {
 				]),
 			};
 			const actual = diff(as, bs);
-			expect(actual).to.eql(expected);
+			const expectedSummary = { a: {flag: 3}, b: {flag: 3} };
+			expect(summerize(actual)).to.eql(expectedSummary);
 		});
 	});
 });

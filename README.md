@@ -1,6 +1,8 @@
 # track-db-test-library
 Test library for Track database challenges
 
+[![Actions Status](https://github.com/givery-technology/track-db-test-library/workflows/Node%20CI/badge.svg)](https://github.com/givery-technology/track-db-test-library/actions)
+
 ## Usage
 
 ### `Connection` module
