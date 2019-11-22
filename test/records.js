@@ -56,7 +56,9 @@ describe('records module', () => {
 		});
 	});
 
-	describe('diff()', () => {
+	describe('diff()', function() {
+		this.timeout(2000);
+
 		it('no diffs for the same records', () => {
 			const as = [
 				{id: 'a', name: 'name #1', flag: true},
@@ -108,6 +110,21 @@ describe('records module', () => {
 			expect(actual).to.eql(expected);
 		});
 
+		function summerize(diff) {
+			const result = { a: {}, b: {} };
+			for (xs of diff.a.values()) {
+				xs.forEach(x => {
+					result.a[x] = (result.a[x] || 0) + 1;
+				});
+			}
+			for (xs of diff.b.values()) {
+				xs.forEach(x => {
+					result.b[x] = (result.b[x] || 0) + 1;
+				});
+			}
+			return result;
+		}
+
 		it('diffs for as which lack records', () => {
 			const as = [
 				{id: 'b', name: 'name #2', flag: false},
@@ -125,7 +142,7 @@ describe('records module', () => {
 				]),
 			};
 			const actual = diff(as, bs);
-			expect(actual).to.eql(expected);
+			expect(summerize(actual)).to.eql(summerize(expected));
 		});
 
 		it('diffs for bs which lack records', () => {
@@ -145,10 +162,29 @@ describe('records module', () => {
 				b: new Map(),
 			};
 			const actual = diff(as, bs);
-			expect(actual).to.eql(expected);
+			expect(summerize(actual)).to.eql(summerize(expected));
 		});
 
-		it('diffs for as which lack columns', () => {
+		it('bench', () => {
+			const as = [];
+			const bs = [];
+			const rep = 1000;
+			for (let i = 0; i < rep; i++) {
+				as.push({
+					id: i,
+					name_a: `name-$i`
+				});
+				bs.push({
+					id: i,
+					name_b: `name-$i`
+				});
+			}
+			const actual = diff(as, bs);
+			const expectedSummary = { a: {name_b: rep}, b: {name_a: rep} };
+			expect(summerize(actual)).to.eql(expectedSummary);
+		});
+
+    it('diffs for as which lack columns', () => {
 			const as = [
 				{id: 'a', name: 'name #1'},
 				{id: 'b', name: 'name #2'},
@@ -201,6 +237,5 @@ describe('records module', () => {
 			const actual = diff(as, bs);
 			expect(actual).to.eql(expected);
 		});
-
 	});
 });
