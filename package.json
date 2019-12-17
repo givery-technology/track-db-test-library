@@ -23,8 +23,10 @@
     "diff-match-patch": "^1.0.4",
     "docopt": "^0.6.2",
     "knex": "^0.19.5",
-    "sqlite3": "^4.0.7",
     "yaml": "^1.6.0"
+  },
+  "peerDependencies": {
+    "sqlite3": "^4.0.7"
   },
   "devDependencies": {
     "chai": "^4.2.0",
