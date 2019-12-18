@@ -8,7 +8,8 @@
   },
   "bin": {
     "run-sql": "bin/run-sql.js",
-    "debug": "bin/debug.js"
+    "debug": "bin/debug.js",
+    "update-track-yml": "bin/update-track-yml.js"
   },
   "repository": {
     "type": "git",
