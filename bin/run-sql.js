@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+/*** DEPRECATED ***/
 const dblib = require('..');
 const { docopt } = require('docopt');
 const fs = require('fs');
