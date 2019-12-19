@@ -100,11 +100,8 @@ async function migrateTrackYml(trackYml, publicTestcasesYml, secretTestcasesYml)
 	const input = debugTestcases.map(testcase => {
 		const exec = testcase.exec.flat();
 		let last = exec.pop();
-		if (last.endsWith('.sql')) {
-			last = _fs.readFileSync(last, 'utf-8');
-		}
 		if (testcase.check.no_fullscan) {
-			last = `EXPLAIN QUERY PLAN\n${last}`;
+			last = `EXPLAIN QUERY PLAN\n${_fs.readFileSync(last, 'utf-8')}`;
 		}
 		return `[${testcase.title.ja || testcase.title}]${
 			exec.map(item => `-- @load ${item}`).join('\n')

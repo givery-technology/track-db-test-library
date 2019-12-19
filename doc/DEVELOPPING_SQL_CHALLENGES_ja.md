@@ -13,7 +13,7 @@ $ npm install -g track-test-utiility track-db-test-library
 
 `track-db-test-library` からは、以下の 2 つのコマンドが利用できるようになります。
 
-* `run-sql`: テンプレート化前の旧チャレンジで使われます。DB 内容の CSV ダンプでも利用します (将来的位には後述の `track-db` コマンドにマージします)。
+* `run-sql`: テンプレート化前の旧チャレンジで使われます。下位互換性のために残しています。コンテンツ作成端末からは削除して構いません。
 * `track-db`: CLI ツール
 
 ## テンプレートの作成
