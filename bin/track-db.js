@@ -20,7 +20,7 @@ const USAGE = `
 Command line tool for track database challenges
 
 Usage:
-  track-db debug [--clean]
+  track-db debug [--clean] [--csv]
   track-db migrate-track-yml [<track.yml> -- <test.public.yml>... -- <test.secret.yml>...]
   track-db dump [--db=<db.sqlite>] [--dir=<directory>]
   track-db -h | --help
@@ -32,7 +32,7 @@ Options:
 (async () => {
 	let args = docopt(USAGE);
 	if (args['debug']) {
-		await debug(args['--clean']);
+		await debug(args['--clean'], args['--csv']);
 	} else if (args['migrate-track-yml']) {
 		await migrateTrackYml(args['<track.yml>'], args['<test.public.yml>'], args['<test.secret.yml>']);
 	} else if (args['dump']) {
@@ -46,7 +46,7 @@ Options:
 	},
 );
 
-async function debug(clean) {
+async function debug(clean, csv) {
 	const queries = (await fs.readFile(process.stdin.fd, 'utf-8'))
 		.split(/--(?:\s*@load\s+([^\s]+)\s*|---+)\n/)
 		.map(block => block.trim())
@@ -62,16 +62,17 @@ async function debug(clean) {
 		});
 	const conn = new dblib.Connection(clean ? {clean} : undefined);
 	const lastResult = (await conn.queryAll(queries)).slice(-1)[0];
-	console.log(format(lastResult.records, lastResult.sql || _`Import from CSV File`, !lastResult.sql));
+	console.log(formatter(csv ? 'csv' : 'default')(lastResult.records, lastResult.sql || _`Import from CSV File`, !lastResult.sql));
 
-	function indent(str, n = 2) {
-		return str.split('\n').map(s => ' '.repeat(n) + s).join('\n');
-	}
 
-	function format(records, sql, inserted) {
-		return _`SQL execution result` +
-			`:\n${indent(sql)}\n\n${indent('') + records.length} ` +
-			(inserted ? _`row(s) inserted` : _`row(s) selected`) + `\n${indent(dblib.records.format(records))}`;
+	function formatter(formatter) {
+		switch (formatter) {
+			case 'csv': return (records, sql) => dblib.records.toCSV(records);
+			default: return (records, sql) =>
+				_`SQL execution result` +
+				`:\n${indent(sql)}\n\n${indent('') + records.length} ` +
+				_`row(s) selected` + `\n${indent(dblib.records.format(records))}`;
+		}
 	}
 }
 
