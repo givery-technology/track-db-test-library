@@ -298,7 +298,7 @@ testcases:
 $ track-db migrate-track-yml
 ```
 
-## データベースのダンプ
+## データベースのダンプ (init ファイル群の作成)
 
 `db.sqlite` でデータベースの作成作業を行った場合、データベースのファイル群 (`CREATE TABLE`, CSV ファイル) をダンプできます。
 
@@ -309,6 +309,16 @@ $ track-db dump
 ```
 
 標準では `init` ディレクトリに `create_db.sql` と、`<テーブル名>.csv` が作成されます。
+
+## データベースのダンプ (模範解答の実行結果 CSV の作成)
+
+例えば以下のようにすることで、"Expected" の CSV を作成できます。
+
+```sh
+$ echo 'sql/step1.sql' | track-db debug --csv > test/data/public/step1.csv
+```
+
+ちなみに、`echo` は `cat` でも結果は同じになります。
 
 ### データベースの編集
 
