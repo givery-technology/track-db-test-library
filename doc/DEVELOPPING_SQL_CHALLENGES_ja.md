@@ -21,8 +21,10 @@ $ npm install -g track-test-utiility track-db-test-library
 `track-test-utility` を使います
 
 ```sh
-$ track-test generate sql
+$ track-test generate <ディレクトリ> sql
 ```
+
+`track-test-utility` に収録されているサンプルは、オープンソースのサンプルデータベース [Sakila](https://dev.mysql.com/doc/sakila/en/) が使われています。このデータベースは動作確認用なので、チャレンジ作成時には新しいデータベースを作成してください。
 
 ## テストケースの作成
 
