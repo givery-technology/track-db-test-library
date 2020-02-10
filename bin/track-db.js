@@ -149,3 +149,7 @@ async function dump(dbfile, directory) {
 
 	console.log(`Finished.`);
 }
+
+function indent(str, n = 2) {
+	return str.split('\n').map(s => ' '.repeat(n) + s).join('\n');
+}
