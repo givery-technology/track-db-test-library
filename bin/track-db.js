@@ -114,7 +114,7 @@ async function migrateTrackYml(trackYml, publicTestcasesYml, secretTestcasesYml)
 	});
 	const trackYmlContent = YAML.parse(await promisify(fs.readFile)(trackYml, 'utf-8'));
 	trackYmlContent.debug = {
-		command: (trackYmlContent.debug || {}).command || 'cat $f | debug --clean',
+		command: (trackYmlContent.debug || {}).command || ('cat $f | debug --clean' + (!!trackYmlContent.client ? ` --client ${trackYmlContent.client}`: '')),
 		input: input
 	};
 	trackYmlContent.testcases = {
