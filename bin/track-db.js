@@ -73,10 +73,12 @@ async function debug(client, clean, csv) {
 	function formatter(formatter) {
 		switch (formatter) {
 			case 'csv': return (records, sql) => dblib.records.toCSV(records);
-			default: return (records, sql) =>
-				_`SQL execution result` +
-				`:\n${indent(sql)}\n\n${indent('') + records.length} ` +
-				_`row(s) selected` + `\n${indent(dblib.records.format(records))}`;
+			default: return (records, sql) => {
+				const formatted = dblib.records.format(records);
+				return _`SQL execution result` +
+				`:\n${indent(sql)}\n\n${indent('') + (formatted === '' ? 0 : records.length)} ` +
+				_`row(s) selected` + `\n${indent(formatted)}`;
+			}
 		}
 	}
 }
