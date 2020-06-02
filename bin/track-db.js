@@ -20,23 +20,24 @@ const USAGE = `
 Command line tool for track database challenges
 
 Usage:
-  track-db debug [--clean] [--csv]
+  track-db debug [--client=<client>] [--clean] [--csv]
   track-db migrate-track-yml [<track.yml> -- <test.public.yml>... -- <test.secret.yml>...]
-  track-db dump [--db=<db.sqlite>] [--dir=<directory>]
+  track-db dump [--client=<client>] [--dir=<directory>]
   track-db -h | --help
-  
+
 Options:
-  --clean   Remove db.sqlite before execution.
+  --clean   Remove all objects before execution.
+  -c --client <client>   Kind of Database Client [sqlite, postgres; default sqlite]
 `;
 
 (async () => {
 	let args = docopt(USAGE);
 	if (args['debug']) {
-		await debug(args['--clean'], args['--csv']);
+		await debug(args['--client'], args['--clean'], args['--csv']);
 	} else if (args['migrate-track-yml']) {
 		await migrateTrackYml(args['<track.yml>'], args['<test.public.yml>'], args['<test.secret.yml>']);
 	} else if (args['dump']) {
-		await dump(args['--db'], args['--dir'])
+		await dump(args['--client'], args['--dir'])
 	}
 })().then(
 	() => process.exit(0),
@@ -46,7 +47,7 @@ Options:
 	},
 );
 
-async function debug(clean, csv) {
+async function debug(client, clean, csv) {
 	const queries = (await fs.readFile(process.stdin.fd, 'utf-8'))
 		.split(/--(?:\s*@load\s+([^\s]+)\s*|---+)\n/)
 		.map(block => block.trim())
@@ -60,7 +61,11 @@ async function debug(clean, csv) {
 					.filter(sql => !!sql);
 			}
 		});
-	const conn = new dblib.Connection(clean ? {clean} : undefined);
+	const option = { client };
+	if (clean) {
+		option.clean = true;
+	}
+	const conn = await dblib.Connection.new(option);
 	const lastResult = (await conn.queryAll(queries)).slice(-1)[0];
 	console.log(formatter(csv ? 'csv' : 'default')(lastResult.records, lastResult.sql || _`Import from CSV File`, !lastResult.sql));
 
@@ -68,10 +73,12 @@ async function debug(clean, csv) {
 	function formatter(formatter) {
 		switch (formatter) {
 			case 'csv': return (records, sql) => dblib.records.toCSV(records);
-			default: return (records, sql) =>
-				_`SQL execution result` +
-				`:\n${indent(sql)}\n\n${indent('') + records.length} ` +
-				_`row(s) selected` + `\n${indent(dblib.records.format(records))}`;
+			default: return (records, sql) => {
+				const formatted = dblib.records.format(records);
+				return _`SQL execution result` +
+				`:\n${indent(sql)}\n\n${indent('') + (formatted === '' ? 0 : records.length)} ` +
+				_`row(s) selected` + `\n${indent(formatted)}`;
+			}
 		}
 	}
 }
@@ -109,7 +116,7 @@ async function migrateTrackYml(trackYml, publicTestcasesYml, secretTestcasesYml)
 	});
 	const trackYmlContent = YAML.parse(await promisify(fs.readFile)(trackYml, 'utf-8'));
 	trackYmlContent.debug = {
-		command: (trackYmlContent.debug || {}).command || 'cat $f | debug --clean',
+		command: (trackYmlContent.debug || {}).command || ('cat $f | debug --clean' + (!!trackYmlContent.client ? ` --client ${trackYmlContent.client}`: '')),
 		input: input
 	};
 	trackYmlContent.testcases = {
@@ -119,13 +126,16 @@ async function migrateTrackYml(trackYml, publicTestcasesYml, secretTestcasesYml)
 	await fs.writeFile(trackYml, YAML.stringify(trackYmlContent), 'utf-8');
 }
 
-async function dump(dbfile, directory) {
-	dbfile = dbfile || 'db.sqlite';
+async function dump(client, directory) {
 	directory = directory || 'init';
 
 	console.log(`The database '${dbfile}' will be dumped into '${directory}'...`);
+	if (!!client && client !== 'sqlite') {
+		// TODO: Lower priority; as this feature is for coaches convenience, will be implemented later.
+		throw Error(`Unsupported Database Type: ${client}`);
+	}
 
-	const conn = new dblib.Connection({file: dbfile});
+	const conn = await dblib.Connection.new({ client });
 
 	const create_sql = (await conn.query("SELECT sql FROM sqlite_master WHERE type <> 'table' OR name <> 'sqlite_sequence'"))
 		.map(record => record.sql + ';\n')

@@ -14,8 +14,9 @@ Runs SQL
 Usage:
   run-sql.js [options] <preparation>...
   run-sql.js -h | --help
-  
+
 Options:
+  -c --client CLIENT   Kind of Database Client [sqlite, postgres; default sqlite]
   -h --help            Show this screen.
   -f --format FORMAT   Formatter to print records [pretty, csv; default: pretty]
 `;
@@ -23,7 +24,7 @@ Options:
 (async() => {
 	try {
 		let args = docopt(usage);
-		const conn = new dblib.Connection();
+		const conn = await dblib.Connection.new({ client: args['--client']});
 		await conn.prepare(preparation(args['<preparation>']));
 		const sqls = (await promisify(fs.readFile)(process.stdin.fd, 'utf8'))
 			.split(";")
