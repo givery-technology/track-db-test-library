@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const { normalize, diff } = require('../lib/records');
+const { normalize, diff, format, toCSV } = require('../lib/records');
 
 describe('records module', () => {
 	describe('normalize()', () => {
@@ -50,6 +50,19 @@ describe('records module', () => {
 			const expected = [
 				{id: '1', name: 'NAME #1'},
 				{id: 'A', name: 'name #2'},
+			];
+			const actual = normalize(input);
+			expect(actual).to.eql(expected);
+		});
+
+		it('can normalize Date into String (for PostgreSQL)', () => {
+			const input = [
+				{ date: new Date("2020/07/07 12:23:45") },
+				{ date: '2020-07-07 12:23:45' },
+			];
+			const expected = [
+				{ date: '2020-07-07 12:23:45' },
+				{ date: '2020-07-07 12:23:45' },
 			];
 			const actual = normalize(input);
 			expect(actual).to.eql(expected);
@@ -243,6 +256,42 @@ describe('records module', () => {
 			const actual = diff(as, bs);
 			const expectedSummary = { a: {flag: 3}, b: {flag: 3} };
 			expect(summerize(actual)).to.eql(expectedSummary);
+		});
+	});
+
+	describe('format()', () => {
+		it('can format records with Date types', () => {
+			const input = [
+				{ date: new Date("2020/07/07 12:23:45") },
+				{ date: '2020-07-07 12:23:45' },
+			];
+			const actual = format(input);
+			const expected = [
+				'-------------------',
+				'date               ',
+				'-------------------',
+				'2020-07-07 12:23:45',
+				'2020-07-07 12:23:45',
+				'-------------------',
+				'',
+			].join('\n');
+			expect(actual).to.eql(expected);
+		});
+	});
+
+	describe('toCSV()', () => {
+		it('can format records with Date types', () => {
+			const input = [
+				{ date: new Date("2020/07/07 12:23:45") },
+				{ date: '2020-07-07 12:23:45' },
+			];
+			const actual = toCSV(input);
+			const expected = [
+				'date',
+				'2020-07-07 12:23:45',
+				'2020-07-07 12:23:45',
+			].join('\n');
+			expect(actual).to.eql(expected);
 		});
 	});
 });
