@@ -49,11 +49,12 @@ Options:
 
 async function debug(client, clean, csv) {
 	const queries = (await fs.readFile(process.stdin.fd, 'utf-8'))
-		.split(/--(?:\s*@load\s+([^\s]+)\s*|---+)\n/)
+		.split(/--(?:\s*@load\s+([^\s]+)\s*|---+)(\n|$)/)
 		.map(block => block.trim())
 		.filter(block => !!block)
 		.flatMap(block => {
-			if (block.endsWith('.csv') || block.endsWith('.sql')) {
+			const split = blockl.split(':');
+			if (/\.(csv|sql)($|:)/.test(block)) {
 				return [block];
 			} else {
 				return block.split(';')
@@ -76,8 +77,8 @@ async function debug(client, clean, csv) {
 			default: return (records, sql) => {
 				const formatted = dblib.records.format(records);
 				return _`SQL execution result` +
-				`:\n${indent(sql)}\n\n${indent('') + (formatted === '' ? 0 : records.length)} ` +
-				_`row(s) selected` + `\n${indent(formatted)}`;
+					`:\n${indent(sql)}\n\n${indent('') + (formatted === '' ? 0 : records.length)} ` +
+					_`row(s) selected` + `\n${indent(formatted)}`;
 			}
 		}
 	}
@@ -110,13 +111,12 @@ async function migrateTrackYml(trackYml, publicTestcasesYml, secretTestcasesYml)
 		if (testcase.check.no_fullscan) {
 			last = `EXPLAIN QUERY PLAN\n${_fs.readFileSync(last, 'utf-8')}`;
 		}
-		return `[${testcase.title.ja || testcase.title}]${
-			exec.map(item => `-- @load ${item}`).join('\n')
+		return `[${testcase.title.ja || testcase.title}]${exec.map(item => `-- @load ${item}`).join('\n')
 			}\n${last}`
 	});
 	const trackYmlContent = YAML.parse(await promisify(fs.readFile)(trackYml, 'utf-8'));
 	trackYmlContent.debug = {
-		command: (trackYmlContent.debug || {}).command || ('cat $f | debug --clean' + (!!trackYmlContent.client ? ` --client ${trackYmlContent.client}`: '')),
+		command: (trackYmlContent.debug || {}).command || ('cat $f | debug --clean' + (!!trackYmlContent.client ? ` --client ${trackYmlContent.client}` : '')),
 		input: input
 	};
 	trackYmlContent.testcases = {
