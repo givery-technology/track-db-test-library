@@ -19,6 +19,9 @@
   "bugs": {
     "url": "https://github.com/givery-technology/track-db-test-library/issues"
   },
+  "engines": {
+    "node": ">=14"
+  },
   "dependencies": {
     "csvjson": "^5.1.0",
     "diff-match-patch": "^1.0.4",
