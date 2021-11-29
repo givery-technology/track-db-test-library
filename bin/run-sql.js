@@ -26,10 +26,7 @@ Options:
 		let args = docopt(usage);
 		const conn = await dblib.Connection.new({ client: args['--client']});
 		await conn.prepare(preparation(args['<preparation>']));
-		const sqls = (await promisify(fs.readFile)(process.stdin.fd, 'utf8'))
-			.split(";")
-			.map(sql => sql.trim())
-			.filter(sql => sql.length > 0);
+		const sqls = dblib.Connection.util.parseSQL(await promisify(fs.readFile)(process.stdin.fd, 'utf8'));
 		for (let sql of sqls) {
 			const records = await conn.query(sql);
 			console.log(formatter(args['--format'])(records, sql));
