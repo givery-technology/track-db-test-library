@@ -53,13 +53,10 @@ async function debug(client, clean, csv) {
 		.map(block => block.trim())
 		.filter(block => !!block)
 		.flatMap(block => {
-			const split = blockl.split(':');
 			if (/\.(csv|sql)($|:)/.test(block)) {
 				return [block];
 			} else {
-				return block.split(';')
-					.map(sql => sql.trim())
-					.filter(sql => !!sql);
+				return dblib.Connection.util.parseSQL(block);
 			}
 		});
 	const option = { client };
