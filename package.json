@@ -1,6 +1,6 @@
 {
   "name": "track-db-test-library",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Test utility for Track database challenges",
   "main": "index.js",
   "scripts": {
