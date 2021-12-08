@@ -20,20 +20,22 @@ const USAGE = `
 Command line tool for track database challenges
 
 Usage:
-  track-db debug [--client=<client>] [--clean] [--csv]
+  track-db debug [--client=<client>] [--clean] [--csv] [--result=<result>] [--limit=<limit>]
   track-db migrate-track-yml [<track.yml> -- <test.public.yml>... -- <test.secret.yml>...]
   track-db dump [--client=<client>] [--dir=<directory>]
   track-db -h | --help
 
 Options:
-  --clean   Remove all objects before execution.
+  --clean                Remove all objects before execution.
   -c --client <client>   Kind of Database Client [sqlite, postgres; default sqlite]
+  -r --result <result>   Which results will be displayed [last, full; default last]
+  -l --limit <limit>     Maximum row count that will be displayed [default 10]
 `;
 
 (async () => {
 	let args = docopt(USAGE);
 	if (args['debug']) {
-		await debug(args['--client'], args['--clean'], args['--csv']);
+		await debug(args['--client'], args['--clean'], args['--csv'], args['--result'] ?? 'last', args['--limit'] ?? 10);
 	} else if (args['migrate-track-yml']) {
 		await migrateTrackYml(args['<track.yml>'], args['<test.public.yml>'], args['<test.secret.yml>']);
 	} else if (args['dump']) {
@@ -47,32 +49,38 @@ Options:
 	},
 );
 
-async function debug(client, clean, csv) {
+async function debug(client, clean, csv, result, limit) {
 	const queries = (await fs.readFile(process.stdin.fd, 'utf-8'))
 		.split(/--(?:\s*@load\s+([^\s]+)\s*|---+)(\n|$)/)
-		.map(block => block.trim())
-		.filter(block => !!block)
-		.flatMap(block => {
-			if (/\.(csv|sql)($|:)/.test(block)) {
-				return [block];
-			} else {
-				return dblib.Connection.util.parseSQL(block);
-			}
-		});
+		.flatMap(block => dblib.Connection.util.parseSQL(block))
+		.filter(block => !!block);
 	const option = { client };
 	if (clean) {
 		option.clean = true;
 	}
+	const formatOption = {};
+	switch (limit) {
+		case '0':
+		case 'unlimited':
+			formatOption.limit = Infinity;
+			break;
+		default:
+			formatOption.limit = Number(limit);
+			break;
+	}
 	const conn = await dblib.Connection.new(option);
-	const lastResult = (await conn.queryAll(queries)).slice(-1)[0];
-	console.log(formatter(csv ? 'csv' : 'default')(lastResult.records, lastResult.sql || _`Import from CSV File`, !lastResult.sql));
-
+	let results = (await conn.queryAll(queries));
+	switch (result) {
+		case 'full': results = results; break;
+		case 'last': results = results.slice(-1); break;
+	}
+	results.forEach(r => console.log(formatter(csv ? 'csv' : 'default')(r.records, r.sql || _`Import from CSV File`, !r.sql)));
 
 	function formatter(formatter) {
 		switch (formatter) {
 			case 'csv': return (records, sql) => dblib.records.toCSV(records);
 			default: return (records, sql) => {
-				const formatted = dblib.records.format(records);
+				const formatted = dblib.records.format(records, formatOption);
 				return _`SQL execution result` +
 					`:\n${indent(sql)}\n\n${indent('') + (formatted === '' ? 0 : records.length)} ` +
 					_`row(s) selected` + `\n${indent(formatted)}`;
