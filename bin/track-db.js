@@ -20,7 +20,7 @@ const USAGE = `
 Command line tool for track database challenges
 
 Usage:
-  track-db debug [--client=<client>] [--clean] [--csv]
+  track-db debug [--client=<client>] [--clean] [--csv] [--result=<result>]
   track-db migrate-track-yml [<track.yml> -- <test.public.yml>... -- <test.secret.yml>...]
   track-db dump [--client=<client>] [--dir=<directory>]
   track-db -h | --help
@@ -33,7 +33,7 @@ Options:
 (async () => {
 	let args = docopt(USAGE);
 	if (args['debug']) {
-		await debug(args['--client'], args['--clean'], args['--csv']);
+		await debug(args['--client'], args['--clean'], args['--csv'], args['--result'] ?? 'last');
 	} else if (args['migrate-track-yml']) {
 		await migrateTrackYml(args['<track.yml>'], args['<test.public.yml>'], args['<test.secret.yml>']);
 	} else if (args['dump']) {
@@ -47,26 +47,22 @@ Options:
 	},
 );
 
-async function debug(client, clean, csv) {
+async function debug(client, clean, csv, result) {
 	const queries = (await fs.readFile(process.stdin.fd, 'utf-8'))
 		.split(/--(?:\s*@load\s+([^\s]+)\s*|---+)(\n|$)/)
-		.map(block => block.trim())
-		.filter(block => !!block)
-		.flatMap(block => {
-			if (/\.(csv|sql)($|:)/.test(block)) {
-				return [block];
-			} else {
-				return dblib.Connection.util.parseSQL(block);
-			}
-		});
+		.flatMap(block => dblib.Connection.util.parseSQL(block))
+		.filter(block => !!block);
 	const option = { client };
 	if (clean) {
 		option.clean = true;
 	}
 	const conn = await dblib.Connection.new(option);
-	const lastResult = (await conn.queryAll(queries)).slice(-1)[0];
-	console.log(formatter(csv ? 'csv' : 'default')(lastResult.records, lastResult.sql || _`Import from CSV File`, !lastResult.sql));
-
+	let results = (await conn.queryAll(queries));
+	switch (result) {
+		case 'full': results = results; break;
+		case 'last': results = results.slice(-1); break;
+	}
+	results.forEach(r => console.log(formatter(csv ? 'csv' : 'default')(r.records, r.sql || _`Import from CSV File`, !r.sql)));
 
 	function formatter(formatter) {
 		switch (formatter) {
