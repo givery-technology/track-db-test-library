@@ -12,3 +12,12 @@ Test library for Track database challenges
 ## License
 
 This software is released under the [MIT License](LICENSE).
+
+## Release Note
+
+### Version 2.1.0
+
+* [Feat] `settings/max_display_rows` test configuration
+* [Feat] `--limit`, `--result=full` options to `track-db.js`
+* [Feat] Block comment support
+* [Bugfix] diff is not displayed correctly under certain conditions
