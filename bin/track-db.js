@@ -62,7 +62,11 @@ async function debug(client, clean, csv, result) {
 		case 'full': results = results; break;
 		case 'last': results = results.slice(-1); break;
 	}
-	results.forEach(r => console.log(formatter(csv ? 'csv' : 'default')(r.records, r.sql || _`Import from CSV File`, !r.sql)));
+	results.forEach(r => {
+		console.log(r);
+		console.log(formatter(csv ? 'csv' : 'default')(r.records, r.sql || _`Import from CSV File`, !r.sql));
+	});
+	// results.forEach(r => console.log(formatter(csv ? 'csv' : 'default')(r.records, r.sql || _`Import from CSV File`, !r.sql)));
 
 	function formatter(formatter) {
 		switch (formatter) {
