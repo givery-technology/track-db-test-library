@@ -15,6 +15,10 @@ This software is released under the [MIT License](LICENSE).
 
 ## Release Note
 
+### Version 2.2.0
+
+* [Feat] Add `precheck.one_command` to check if the file contains only one command.
+
 ### Version 2.1.0
 
 * [Feat] `settings/max_display_rows` test configuration

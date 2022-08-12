@@ -162,6 +162,18 @@ title: "[制限事項] 生成されるインデックスは4つ以内である"
       - sql/step2.sql
   ```
 
+* `one_command` (任意)
+
+  与えられた SQL ファイルに、なんらかの SQL 文が含まれており、かつ、単一文であることを確認します。
+  `not_empty` と共存できますが、意味はありません。
+
+  ```yaml
+  precheck:
+    not_empty:
+      - sql/step1.sql
+      - sql/step2.sql
+  ```
+
 * `ecma` (任意; 非推奨)
 
   どうしても JavaScript を実行したい場合に指定します。関数 (`async` 関数を含む) の場合、第一引数には `Connection` が渡されます。
