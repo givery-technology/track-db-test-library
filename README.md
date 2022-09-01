@@ -15,6 +15,10 @@ This software is released under the [MIT License](LICENSE).
 
 ## Release Note
 
+### Version 2.3.0
+
+* Bump sqlite3 to 5.0.11
+
 ### Version 2.2.0
 
 * [Feat] Add `precheck.one_command` to check if the file contains only one command.
