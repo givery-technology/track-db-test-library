@@ -1,6 +1,6 @@
 {
   "name": "track-db-test-library",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Test utility for Track database challenges",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "url": "https://github.com/givery-technology/track-db-test-library/issues"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "dependencies": {
     "csvjson": "^5.1.0",
@@ -31,7 +31,7 @@
     "yaml": "^1.6.0"
   },
   "peerDependencies": {
-    "sqlite3": "^4.0.7"
+    "sqlite3": "^5.0.11"
   },
   "devDependencies": {
     "chai": "^4.2.0",
