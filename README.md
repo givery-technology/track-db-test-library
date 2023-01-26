@@ -15,6 +15,14 @@ This software is released under the [MIT License](LICENSE).
 
 ## Release Note
 
+### Version 2.4.0
+
+* [Feat] Improve error message in `recordEqual` processing when column names are different.
+  
+### Version 2.3.1
+
+* [Bugfix] The `precheck` process in handling whitespace.
+
 ### Version 2.3.0
 
 * Bump sqlite3 to 5.0.11
