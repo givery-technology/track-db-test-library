@@ -18,6 +18,7 @@ This software is released under the [MIT License](LICENSE).
 ### Version 2.4.0
 
 * [Feat] Improve error message in `recordEqual` processing when column names are different.
+* [Security] Security updates
   
 ### Version 2.3.1
 
