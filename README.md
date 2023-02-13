@@ -15,6 +15,12 @@ This software is released under the [MIT License](LICENSE).
 
 ## Release Note
 
+### Version 2.5.0
+
+* [Feat] Checks for table schema (API / Runner)
+* [Feat] Checks for auto increment (API / Runner)
+* [Feat] Prechecks: `column` / `without` (Runner)
+
 ### Version 2.4.0
 
 * [Feat] Improve error message in `recordEqual` processing when column names are different.

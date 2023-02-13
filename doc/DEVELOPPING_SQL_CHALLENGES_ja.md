@@ -211,6 +211,33 @@ testcases:
       - sql/step1.sql
 ```
 
+#### `table`
+
+`exec` の特殊系で、テーブル定義を読み込みます。
+
+テーブル定義は以下のレコードとして取得されます。
+後述の `check` で評価できます。ただし、SQL に対する評価 (フルスキャン等) はできません。
+
+| 名前 | 説明 |
+|------------|--------------|
+| `order`    | カラムの定義順 (1 始まり) |
+| `name`     | カラム名 |
+| `raw_type` | カラム型 (RDBMS による) |
+
+例:
+```yaml
+testcases:
+  - title: ...
+    exec:
+      - CREATE TABLE my_table (a INT, b TEXT)
+    table: my_table
+    check:
+      column: [name]
+      equal_to:
+        - name: a
+        - name: b
+```
+
 #### `check` (通常テストケース)
 
 `exec` での最後の SQL・CSV の実行結果に対して評価を行います。
@@ -227,6 +254,36 @@ testcases:
         - sql/step1.sql
       check:
         equal_to: test/out/public/step1.csv
+  ```
+
+* [前処理] `columns`
+  
+  指定されると、評価対象カラムを `columns` だけに絞ります。
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+      check:
+        columns: 
+          - id
+          - name
+  ```
+
+* [前処理] `without`
+  
+  指定されると、評価対象カラムから `without` を除きます。
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+      check:
+        without: 
+          - id
+          - name
   ```
 
 * [前処理] `order_by`
@@ -258,29 +315,6 @@ testcases:
 
 `check` に以下の項目を設定すると、特殊な評価モードに移行します。
 
-* `ecma`
-
-  どうしても JavaScript を実行したい場合に指定します。関数 (`async` 関数を含む) の場合、第一引数には `Connection` が渡されます。
-  テストケースが作れない場合をのぞいて多用は避けてください。
-
-  * 例: 「自動採番」のチェック
-
-    ```yaml
-    testcase:
-      title: [更新系クエリ] Step1 宿泊施設IDが自動採番されている
-      exec: *init_db
-      check:
-        ecma: |-
-          async conn => {
-            const randomId = Math.floor(Math.random() * Math.floor(900000)) + 100000;
-            await conn.query("UPDATE sqlite_sequence SET seq = ? WHERE name = 'hotels'", [randomId]);
-            await conn.queryFromFile("sql/step1.sql");
-            const inserted = await tx.query("SELECT * FROM hotels WHERE id = last_insert_rowid()");
-            expect(inserted).to.lengthOf(1, _`追加されたデータが見つかりません`);
-            expect(inserted).columns('id').to.recordEqual([{id: randomId + 1}], _`自動採番値 (ランダム) が使われていません`);
-          }
-    ```
-
 * `no_fullscan: true`
 
   最後に実行された SQL の実行計画を取得します。
@@ -305,6 +339,53 @@ testcases:
 
     特定テーブル、もしくは全テーブルに関するインデックスで対象となったカラム数の範囲をチェックします。
     `ge` (指定数より多い)、`gt` (指定数以上)、`le` (指定数より少ない)、`lt` (指定数以下) を組み合わせます。
+
+* `auto_increment`
+
+  特定のカラムが自動採番になっているかどうかをテストします。
+
+  ※ SQLite の場合、対象テーブルに必ず 1 件以上のレコードが存在する状態にしてください。そうでないと正しく動作しません。
+  
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+      check:
+        auto_increment:
+          table: my_table
+          column: id
+          data:
+            - name: John
+              age: 24
+              sex: male
+            - name: Karen
+              age: 21
+              sex: female
+  ```
+
+* `ecma`
+
+  どうしても JavaScript を実行したい場合に指定します。関数 (`async` 関数を含む) の場合、第一引数には `Connection` が渡されます。
+  テストケースが作れない場合をのぞいて多用は避けてください。
+
+  * 例: 「自動採番」のチェック
+
+    ```yaml
+    testcase:
+      title: [更新系クエリ] Step1 宿泊施設IDが自動採番されている
+      exec: *init_db
+      check:
+        ecma: |-
+          async conn => {
+            const randomId = Math.floor(Math.random() * Math.floor(900000)) + 100000;
+            await conn.query("UPDATE sqlite_sequence SET seq = ? WHERE name = 'hotels'", [randomId]);
+            await conn.queryFromFile("sql/step1.sql");
+            const inserted = await tx.query("SELECT * FROM hotels WHERE id = last_insert_rowid()");
+            expect(inserted).to.lengthOf(1, _`追加されたデータが見つかりません`);
+            expect(inserted).columns('id').to.recordEqual([{id: randomId + 1}], _`自動採番値 (ランダム) が使われていません`);
+          }
+    ```
 
 ### `debug: false` (任意)
 

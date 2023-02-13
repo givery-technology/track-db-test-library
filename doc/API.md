@@ -52,6 +52,15 @@ console.log(sql); // EXPLAIN QUERY PLAN SELECT * AS count FROM emp
 
 Loads records from CSV and inserts them into the given table
 
+#### async `Connection#tableSchema(table)`
+
+Queries the table schema.
+
+```javascript
+const columns = await conn.tableSchema("my_table");
+columns.forEach(({order, name, type}) => console.log(name));
+```
+
 ### `records` module
 
 Utility for query result records
@@ -195,7 +204,7 @@ expect([
 ]);
 ``` 
 
-#### `recordEqualToCsv(path, opt_message)
+#### `recordEqualToCsv(path, opt_message)`
 
 Target will be loaded from CSV file.
 

@@ -1,0 +1,10 @@
+testcases:
+  - title: "[should success] table structure test"
+    exec:
+      - CREATE TABLE my_table (a INT, b TEXT)
+    table: my_table
+    check:
+      columns: [name]
+      equal_to:
+        - name: a
+        - name: b
