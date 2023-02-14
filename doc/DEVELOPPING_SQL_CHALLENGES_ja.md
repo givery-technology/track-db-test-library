@@ -244,7 +244,7 @@ testcases:
 
 * [評価] `equal_to`
 
-  指定した CSV ファイルと実行結果が一致することを確認します。
+  指定した CSV ファイル、もしくはオブジェクトと実行結果が一致することを確認します。
 
   ```yaml
   testcases:
@@ -255,6 +255,56 @@ testcases:
       check:
         equal_to: test/out/public/step1.csv
   ```
+
+* [評価] `contain`
+
+  指定したオブジェクトを含んでいることを確認します。
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+        - sql/step1.sql
+      check:
+        contain:
+          name: John
+          age: 24
+          sex: male  
+  ```
+
+  文字列を指定した場合、JavaScript の関数 (Predicate) であるとして、レコードが関数で「正」と判定されるレコードが存在することを確認します。
+
+  ```yaml
+  testcases:
+  - title: ...
+    exec:
+      - ...
+      - sql/step1.sql
+    check:
+      contain: record => record.age > 30 
+  ```
+
+  > 関数判定の場合、テスト失敗時のメッセージに「期待値」は表示されなくなります。
+  > 事前に評価対象カラムをソート (`order_by`、後述) するなどの工夫をすると良いでしょう。
+
+* [評価] `not`
+
+  「評価」の判定条件を反転します。
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+        - sql/step1.sql
+      check:
+        not:
+          contain:
+            name: John
+            age: 24
+            sex: male  
+  ```  
 
 * [前処理] `columns`
   

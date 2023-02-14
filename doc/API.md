@@ -220,6 +220,28 @@ empno,deptno,name
 1,10,Scott
 ```
 
+#### `recordContain(value)`
+
+Asserts if the records contain the given value.
+
+```javascript
+expect([
+  { name: "John",  age: 24, sex: "male" },
+  { name: "Karen", age: 21, sex: "female" },
+]).to.recordContain(
+  { name: "John",  age: 24, sex: "male" },
+);
+```
+
+`recordContain` supports function matching.
+
+```javascript
+expect([
+  { name: "John",  age: 24, sex: "male" },
+  { name: "Karen", age: 21, sex: "female" },
+]).to.recordContain(r => r.age === 24);
+```
+
 #### `columns(xs)`
 
 Retains given column(s) from actual records (no assertion)

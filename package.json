@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "csvjson": "^5.1.0",
+    "deep-equal": "^2.2.0",
     "diff-match-patch": "^1.0.4",
     "docopt": "^0.6.2",
     "eaw": "^0.1.5",
