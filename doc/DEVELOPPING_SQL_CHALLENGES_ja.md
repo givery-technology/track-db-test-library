@@ -325,6 +325,24 @@ testcases:
           sex: male  
   ```
 
+  オブジェクトを複数指定した場合、サブセットである (指定したすべての要素をレコードが含む) ことを確認します。
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+        - sql/step1.sql
+      check:
+        contain:
+          - name: John
+            age: 24
+            sex: male  
+          - name: Karen
+            age: 21
+            sex: female
+  ```  
+
   文字列を指定した場合、JavaScript の関数 (Predicate) であるとして、レコードが関数で「正」と判定されるレコードが存在することを確認します。
 
   ```yaml

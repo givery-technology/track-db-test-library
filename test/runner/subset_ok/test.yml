@@ -1,0 +1,17 @@
+testcases:
+  - title: "[should success] `contain` with array works as subset check"
+    exec:
+      - CREATE TABLE users (name TEXT, age INT, sex TEXT)
+      - |-
+        INSERT INTO users VALUES 
+          ('John', 24, 'male'),
+          ('Karen', 21, 'female')
+      - SELECT * FROM users
+    check:
+      contain:
+        - name: John
+          age: 24
+          sex: male
+        - name: Karen
+          age: 21
+          sex: female

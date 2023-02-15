@@ -44,6 +44,27 @@ describe('assertions module', () => {
 				{ name: "Karen", age: 21, sex: "female" },
 			]).not.to.recordContain(r => r.age === 30);
 		});
+
+		it('array contains (subset)', () => {
+			expect([
+				{ name: "John",  age: 24, sex: "male" },
+				{ name: "Karen", age: 21, sex: "female" },
+				{ name: "David",  age: 30, sex: "male" },
+			]).to.recordContain([
+				{ name: "Karen", age: 21, sex: "female" },
+				{ name: "David",  age: 30, sex: "male" },
+			])
+		});
+
+		it('array not contains (subset)', () => {
+			expect([
+				{ name: "John",  age: 24, sex: "male" },
+				{ name: "Karen", age: 21, sex: "female" },
+			]).not.to.recordContain([
+				{ name: "Karen", age: 21, sex: "female" },
+				{ name: "David",  age: 30, sex: "male" },
+			])
+		});
 	});
 
 	describe('fullscan()', () => {
