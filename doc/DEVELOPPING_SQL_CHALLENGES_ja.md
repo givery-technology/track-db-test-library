@@ -223,6 +223,9 @@ testcases:
 | `order`    | カラムの定義順 (1 始まり) |
 | `name`     | カラム名 |
 | `raw_type` | カラム型 (RDBMS による) |
+| `fks`      | 外部キー: `Array<{ table: string, column: string}>` |
+
+※ 複数カラムの外部キーに対する挙動は未定義です
 
 例:
 ```yaml
@@ -241,6 +244,10 @@ testcases:
 #### `check` (通常テストケース)
 
 `exec` での最後の SQL・CSV の実行結果に対して評価を行います。
+
+* `message`
+
+  エラーメッセージを規定値以外のものに差替えます
 
 * [評価] `equal_to`
 

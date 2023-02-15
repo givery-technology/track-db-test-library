@@ -91,12 +91,36 @@ describe('connections module', () => {
 
 				const actual = await conn.tableSchema('my_table');
 				const expected = [
-					{ order: 1, name: 'column1', raw_type: 'INTEGER' },
-					{ order: 2, name: 'column3', raw_type: 'TEXT' },
-					{ order: 3, name: 'column2', raw_type: 'DATE' },
+					{ order: 1, name: 'column1', raw_type: 'INTEGER', fks: [] },
+					{ order: 2, name: 'column3', raw_type: 'TEXT', fks: [] },
+					{ order: 3, name: 'column2', raw_type: 'DATE', fks: [] },
 				];
 				expect(actual).to.deep.equal(expected);
 			});
+
+			it("works with foreign key", async () => {
+				await conn.query(`DROP TABLE IF EXISTS a`);
+				await conn.query(`
+					CREATE TABLE a (
+						id   INTEGER PRIMARY KEY AUTOINCREMENT,
+						name TEXT
+					)
+				`);
+				await conn.query(`DROP TABLE IF EXISTS b`);
+				await conn.query(`
+					CREATE TABLE b (
+						id   INTEGER PRIMARY KEY AUTOINCREMENT,
+						a_id INTEGER,
+						FOREIGN KEY(a_id) REFERENCES a(id)
+					)
+				`);
+				const actual = await conn.tableSchema('b');
+				const expected = [
+					{ order: 1, name: 'id', raw_type: 'INTEGER', fks: [] },
+					{ order: 2, name: 'a_id', raw_type: 'INTEGER', fks: [ { table: 'a', column: 'id'} ] },
+				];
+				expect(actual).to.deep.equal(expected);
+			})
 		});
 
 		describe("updateAutoIncrement()", () => {
