@@ -255,6 +255,58 @@ testcases:
       check:
         equal_to: test/out/public/step1.csv
   ```
+* [評価] `len`
+  
+  レコードの件数に対して評価を行います。数字を指定した場合、件数が指定数と一致するかを検証します。
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+        - sql/step1.sql
+      check:
+        len: 5
+  ```
+
+  * `least`: 件数が指定数以上であることを検証します。
+
+    ```yaml
+    testcases:
+      - title: ...
+        exec:
+          - ...
+          - sql/step1.sql
+        check:
+          len: 
+            least: 1
+    ```
+
+  * `most`: 件数が指定数以下であることを検証します。
+
+    ```yaml
+    testcases:
+      - title: ...
+        exec:
+          - ...
+          - sql/step1.sql
+        check:
+          len: 
+            most: 10
+    ```
+  
+  * `not` と組み合わせることも可能です。その場合、`not.len` のように定義します。
+ 
+    ```yaml
+    testcases:
+      - title: ...
+        exec:
+          - ...
+          - sql/step1.sql
+        check:
+          not:
+            len: 0 # Non empty check
+    ```
 
 * [評価] `contain`
 

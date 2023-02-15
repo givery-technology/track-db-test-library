@@ -70,7 +70,7 @@ describe('connections module', () => {
 			conn = await Connection.new({
 				client: 'sqlite3',
 				clean: true,
-				connection: ':memory:',
+				file: ':memory:',
 			})
 		});
 

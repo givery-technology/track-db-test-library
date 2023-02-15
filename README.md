@@ -17,6 +17,8 @@ This software is released under the [MIT License](LICENSE).
 
 ### Version 2.5.0
 
+* [Feat] Allow multiple checks in a single testcase (Runner)
+* [Feat] Checks for record length (Runner)
 * [Feat] Checks for table schema (API / Runner)
 * [Feat] Checks for auto increment (API / Runner)
 * [Feat] Prechecks: `column` / `without` (Runner)
