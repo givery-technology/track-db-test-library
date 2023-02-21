@@ -491,6 +491,69 @@ testcases:
               sex: female
   ```
 
+* `last_sql`
+
+  最期に実行された SQL そのものをテストします。
+
+  * `match` に正規表現を指定した場合、正規表現にマッチすることをテストします
+
+    ```yaml
+    testcases:
+      - title: ...
+        exec:
+          - ...
+        check:
+          last_sql:
+            match: /^SELECT\s/i
+            message:
+              ja: SELECT 文以外の SQL が発行されています
+              en: SQL other than the SELECT statement has been executed
+    ```
+
+  * `match` に関数を指定した場合、関数に受理されることをテストします
+
+    ```yaml
+    testcases:
+      - title: ...
+        exec:
+          - ...
+        check:
+          last_sql:
+            match: sql => /^SELECT\s/i.test(sql)
+            message:
+              ja: SELECT 文以外の SQL が発行されています
+              en: SQL other than the SELECT statement has been executed
+    ```
+
+  * `match` には複数条件を指定することもできます。その場合、条件に全て合致した場合にのみテストが成功します。
+
+    ```yaml
+    testcases:
+      - title: ...
+        exec:
+          - ...
+        check:
+          last_sql:
+            match: 
+              - /^UPDATE\s/i
+              - /\sRETURNING\s+\*$/i
+            message:
+              ja: UPDATE 文以外の SQL が発行されています
+              en: SQL other than the UPDATE statement has been executed
+    ```
+
+  * `message` には、エラーメッセージを指定できます (省略可)
+
+    ```yaml
+    message: message に直接指定すると、言語の切り替えには対応しません
+    ```
+
+    ```yaml
+    message:
+      ja: 言語切り替えに対応する場合、このように記述します
+      en: To support language switching, write like this
+    ```
+
 * `ecma`
 
   どうしても JavaScript を実行したい場合に指定します。関数 (`async` 関数を含む) の場合、第一引数には `Connection` が渡されます。

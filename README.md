@@ -21,6 +21,7 @@ This software is released under the [MIT License](LICENSE).
 * [Feat] Checks for record length (Runner)
 * [Feat] Checks for table schema (API / Runner)
 * [Feat] Checks for auto increment (API / Runner)
+* [Feat] Checks for last executed SQL (Runner)
 * [Feat] Prechecks: `column` / `without` (Runner)
 
 ### Version 2.4.0
