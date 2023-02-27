@@ -263,7 +263,7 @@ testcases:
         equal_to: test/out/public/step1.csv
   ```
 * [評価] `len`
-  
+
   レコードの件数に対して評価を行います。数字を指定した場合、件数が指定数と一致するかを検証します。
 
   ```yaml
@@ -285,7 +285,7 @@ testcases:
           - ...
           - sql/step1.sql
         check:
-          len: 
+          len:
             least: 1
     ```
 
@@ -298,12 +298,12 @@ testcases:
           - ...
           - sql/step1.sql
         check:
-          len: 
+          len:
             most: 10
     ```
-  
+
   * `not` と組み合わせることも可能です。その場合、`not.len` のように定義します。
- 
+
     ```yaml
     testcases:
       - title: ...
@@ -329,7 +329,7 @@ testcases:
         contain:
           name: John
           age: 24
-          sex: male  
+          sex: male
   ```
 
   オブジェクトを複数指定した場合、サブセットである (指定したすべての要素をレコードが含む) ことを確認します。
@@ -344,11 +344,11 @@ testcases:
         contain:
           - name: John
             age: 24
-            sex: male  
+            sex: male
           - name: Karen
             age: 21
             sex: female
-  ```  
+  ```
 
   文字列を指定した場合、JavaScript の関数 (Predicate) であるとして、レコードが関数で「正」と判定されるレコードが存在することを確認します。
 
@@ -359,7 +359,7 @@ testcases:
       - ...
       - sql/step1.sql
     check:
-      contain: record => record.age > 30 
+      contain: record => record.age > 30
   ```
 
   > 関数判定の場合、テスト失敗時のメッセージに「期待値」は表示されなくなります。
@@ -380,11 +380,11 @@ testcases:
           contain:
             name: John
             age: 24
-            sex: male  
-  ```  
+            sex: male
+  ```
 
 * [前処理] `columns`
-  
+
   指定されると、評価対象カラムを `columns` だけに絞ります。
 
   ```yaml
@@ -393,13 +393,13 @@ testcases:
       exec:
         - ...
       check:
-        columns: 
+        columns:
           - id
           - name
   ```
 
 * [前処理] `without`
-  
+
   指定されると、評価対象カラムから `without` を除きます。
 
   ```yaml
@@ -408,7 +408,7 @@ testcases:
       exec:
         - ...
       check:
-        without: 
+        without:
           - id
           - name
   ```
@@ -472,7 +472,7 @@ testcases:
   特定のカラムが自動採番になっているかどうかをテストします。
 
   ※ SQLite の場合、対象テーブルに必ず 1 件以上のレコードが存在する状態にしてください。そうでないと正しく動作しません。
-  
+
   ```yaml
   testcases:
     - title: ...
@@ -534,7 +534,7 @@ testcases:
           - ...
         check:
           last_sql:
-            match: 
+            match:
               - /^UPDATE\s/i
               - /\sRETURNING\s+\*$/i
             message:
@@ -576,6 +576,48 @@ testcases:
             expect(inserted).columns('id').to.recordEqual([{id: randomId + 1}], _`自動採番値 (ランダム) が使われていません`);
           }
     ```
+
+### `foreach` / `template`
+
+テンプレートを利用して繰り返しのテストケースが作れます。テンプレート中の文字列のうち、`{{` ～ `}}` (でかつ `foreach` 中に定義されているもの) は、`foreach` の各項目の内容に置き換わります。
+
+```yaml
+testcases:
+  - foreach:
+      - table: my_table
+        column: my_column
+      - table: another_table
+        column: another_column
+    template:
+      title: "{{table}} テーブルには {{column}} カラムが存在する"
+      ...
+```
+
+テンプレートで置き換える対象のキーが 1 つしかない場合は、`foreach` には値の配列を直接指定できます。この場合のキーは `item` となります。
+
+```yaml
+testcases:
+  - foreach:
+      - my_column
+      - another_column
+    template:
+      title: "my_table テーブルには {{column}} カラムが存在する"
+```
+
+一部のデータにデフォルト値を設定したい場合は、`default` で設定できます
+
+```yaml
+testcases:
+  - foreach:
+      - column: my_column
+      - table: another_table
+    default:
+      table: my_table
+      column: another_column
+    template:
+      title: "{{table}} テーブルには {{column}} カラムが存在する"
+      ...
+```
 
 ### `debug: false` (任意)
 

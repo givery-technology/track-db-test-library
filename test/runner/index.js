@@ -8,7 +8,7 @@ const path = require("path");
 const util = require("util");
 
 describe("TestRunner", function() {
-    this.slow(1000);
+	this.slow(1000);
 	glob("**/config.json").forEach((configPath) => {
 		const config = JSON.parse(fs.readFileSync(configPath));
 		it(!!config.description ? config.description : configPath, async () => {
