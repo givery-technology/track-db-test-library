@@ -56,5 +56,30 @@ describe('util module', () => {
 			expect(actual).to.deep.equal(expected);
 			expect(template).not.to.deep.equal(expected);
 		});
+		it('should work with data replacer', () => {
+			const props = {
+				a: "Value A",
+				data: {
+					x: 10,
+					y: 20,
+				},
+			};
+			const template = {
+				a: "== {{a}} ==",
+				data: "{{{data}}}",
+				non_data: "== {{{data}}} ==",
+			};
+			const expected = {
+				a: "== Value A ==",
+				data: {
+					x: 10,
+					y: 20,
+				},
+				non_data: "== {{{data}}} ==",
+			}
+			const actual = applyTemplate(props, undefined, template);
+
+			expect(actual)
+		});
 	});
 });

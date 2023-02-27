@@ -619,6 +619,25 @@ testcases:
       ...
 ```
 
+また、テンプレート側の文字列が `{{{data}}}` に一致する時、その文字列をキー `data` に対応する値に置き換えます。オブジェクト等をテンプレートに設定するのに有効です。
+
+```yaml
+testcases:
+  - foreach:
+      - table: my_table
+        data:
+          - column1: value1
+            column2: value2
+    template:
+      title: "{{table}} テーブルの id カラムは自動採番される"
+      ...
+      check:
+        auto_increment:
+          table: "{{my_table}}"
+          column: id
+          data: "{{{data}}}"
+```
+
 ### `debug: false` (任意)
 
 `false` を指定すると、そのテストケースはデバッグ実行 (後述) の対象外となります。
