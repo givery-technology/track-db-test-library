@@ -561,6 +561,7 @@ testcases:
   * `sql`: エラーになるべき SQL を指定します
   * `expected`: 期待するエラーの種類を指定します
     * `not_null`: NOT NULL 制約違反
+    * `unique`: UNIQUE 制約違反
     * `unknown`: 上記のどれにも該当しないエラー
 
   * `message` には、エラーメッセージを指定できます (省略可)
