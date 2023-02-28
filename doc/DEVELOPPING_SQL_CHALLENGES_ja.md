@@ -560,6 +560,7 @@ testcases:
 
   * `sql`: エラーになるべき SQL を指定します
   * `expected`: 期待するエラーの種類を指定します
+    * `check`: CHECK 制約違反
     * `not_null`: NOT NULL 制約違反
     * `unique`: UNIQUE 制約違反
     * `unknown`: 上記のどれにも該当しないエラー
