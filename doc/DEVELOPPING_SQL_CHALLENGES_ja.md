@@ -554,6 +554,27 @@ testcases:
       en: To support language switching, write like this
     ```
 
+* `error`
+
+  指定した SQL がエラーになることをチェックします。
+
+  * `sql`: エラーになるべき SQL を指定します
+  * `expected`: 期待するエラーの種類を指定します
+    * `not_null`: NOT NULL 制約違反
+    * `unknown`: 上記のどれにも該当しないエラー
+
+  * `message` には、エラーメッセージを指定できます (省略可)
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - ...
+      check:
+        error:
+          sql: INSERT INTO ...
+          expected: not_null
+  ```
 * `ecma`
 
   どうしても JavaScript を実行したい場合に指定します。関数 (`async` 関数を含む) の場合、第一引数には `Connection` が渡されます。
