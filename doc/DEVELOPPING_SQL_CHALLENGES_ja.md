@@ -577,6 +577,15 @@ testcases:
           sql: INSERT INTO ...
           expected: not_null
   ```
+
+* `performance`
+
+  指定した SQL の実行が指定時間内に収まることをチェックします。
+
+  * `sql`: 計測対象となる SQL を指定します。
+  * `threshold`: 計測対象の上限時間 (ms) を指定します (省略可)。デフォルトは 200 です
+  * `message` には、エラーメッセージを指定できます (省略可)
+
 * `ecma`
 
   どうしても JavaScript を実行したい場合に指定します。関数 (`async` 関数を含む) の場合、第一引数には `Connection` が渡されます。
