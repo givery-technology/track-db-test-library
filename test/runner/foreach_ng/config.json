@@ -1,4 +1,0 @@
-{
-	"description": "`foreach` should fail for invalid testcases",
-	"success": false
-}

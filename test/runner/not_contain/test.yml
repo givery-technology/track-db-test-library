@@ -1,0 +1,29 @@
+testcases:
+  - title: "[ok] not contain check test"
+    exec:
+      - CREATE TABLE users (name TEXT, age INT, sex TEXT)
+      - |-
+        INSERT INTO users VALUES
+          ('John', 24, 'male'),
+          ('Karen', 21, 'female')
+      - SELECT * FROM users
+    check:
+      not:
+        contain:
+          name: Karen
+          age: 24
+          sex: male
+  - title: "[ng] not contain check test"
+    exec:
+      - CREATE TABLE users (name TEXT, age INT, sex TEXT)
+      - |-
+        INSERT INTO users VALUES
+          ('John', 24, 'male'),
+          ('Karen', 21, 'female')
+      - SELECT * FROM users
+    check:
+      not:
+        contain:
+          name: John
+          age: 24
+          sex: male

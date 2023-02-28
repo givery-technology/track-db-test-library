@@ -1,5 +1,5 @@
 testcases:
-  - title: "[should success] `columns` and `contain` should be used together"
+  - title: "[ok] `columns` and `contain` should be used together"
     exec:
       - CREATE TABLE users (name TEXT, age INT, sex TEXT)
       - |-

@@ -9,14 +9,12 @@ const util = require("util");
 
 describe("TestRunner", function() {
 	this.slow(1000);
-	glob("**/config.json").forEach((configPath) => {
+	glob(`**/config.json`).forEach((configPath) => {
 		const config = JSON.parse(fs.readFileSync(configPath));
 		it(!!config.description ? config.description : configPath, async () => {
-			const r = await exec("mocha", ["-R", "tap", "test.js"], path.dirname(configPath));
-			if (config.success) {
-				expect(r.code, r.stdout + "\n\n" + r.stderr).to.equal(0);
-			} else {
-				expect(r.code, r.stdout + "\n\n" + r.stderr).to.not.equal(0);
+			const result = parse(await exec("mocha", ["-R", "tap", "test.js"], path.dirname(configPath)));
+			for (let r of result) {
+				expect(r.success, `Failed ${r.index} th testcase: ${r.title}`).to.be.true;
 			}
 		});
 	});
@@ -35,4 +33,16 @@ function exec(command, args, basePath) {
 			});
 		});
 	});
+}
+
+function parse(r) {
+	return r.stdout.split('\n')
+		.map(line => /^(not\s+)?ok\s+(\d+)\s+\[([^\]]+)\]\s+(\S.*)/.exec(line))
+		.filter(m => !!m)
+		.map(m => ({
+			index: Number(m[2]),
+			ok: m[3] === 'ok',
+			success: !m[1] ? m[3] === 'ok' : m[3] !== 'ok',
+			title: m[4],
+		}));
 }
