@@ -24,6 +24,8 @@ This software is released under the [MIT License](LICENSE).
 * [Feat] Checks for last executed SQL (Runner)
 * [Feat] Prechecks: `column` / `without` (Runner)
 * [Feat] Multiple test case generation with a simple template engine
+* [Feat] Performance check (Runner)
+* [Feat] Checks for column list (Runner)
 
 ### Version 2.4.0
 

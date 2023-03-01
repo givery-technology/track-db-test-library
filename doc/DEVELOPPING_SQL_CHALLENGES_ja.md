@@ -438,6 +438,29 @@ testcases:
     - -column3
   ```
 
+* [前処理] `column_list`
+
+  `true` を指定すると、カラムリストのみを評価対象とします。対象となるデータには 1 レコード以上のデータを含む必要があります。
+
+  | 名前 | 説明 |
+  |------------|--------------|
+  | `order`    | カラムの定義順 (1 始まり) |
+  | `name`     | カラム名 |
+
+  ```yaml
+  testcases:
+    - title: ...
+      exec:
+        - SELECT id, name FROM my_table
+      check:
+        column_list: true
+        equal_to:
+          - order: 1
+            name: id
+          - order: 2
+            name: name
+  ```
+
 #### `check` (特殊テストケース)
 
 `check` に以下の項目を設定すると、特殊な評価モードに移行します。

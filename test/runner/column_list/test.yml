@@ -1,0 +1,35 @@
+testcases:
+  - title: "[ok] column list check"
+    exec:
+      - CREATE TABLE users (name TEXT, age INT, sex TEXT)
+      - |-
+        INSERT INTO users VALUES
+          ('John', 24, 'male'),
+          ('Karen', 21, 'female')
+      - SELECT age, name, sex FROM users
+    check:
+      column_list: true
+      equal_to:
+        - order: 1
+          name: age
+        - order: 2
+          name: name
+        - order: 3
+          name: sex
+  - title: "[ng] column list check"
+    exec:
+      - CREATE TABLE users (name TEXT, age INT, sex TEXT)
+      - |-
+        INSERT INTO users VALUES
+          ('John', 24, 'male'),
+          ('Karen', 21, 'female')
+      - SELECT age, name, sex FROM users
+    check:
+      column_list: true
+      equal_to:
+        - order: 1
+          name: name
+        - order: 2
+          name: age
+        - order: 3
+          name: sex
