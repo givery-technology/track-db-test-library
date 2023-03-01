@@ -12,9 +12,10 @@ describe("TestRunner", function() {
 	glob(`**/config.json`).forEach((configPath) => {
 		const config = JSON.parse(fs.readFileSync(configPath));
 		it(!!config.description ? config.description : configPath, async () => {
-			const result = parse(await exec("mocha", ["-R", "tap", "test.js"], path.dirname(configPath)));
-			for (let r of result) {
-				expect(r.success, `Failed ${r.index} th testcase: ${r.title}`).to.be.true;
+			const result = await exec("mocha", ["-R", "tap", "test.js"], path.dirname(configPath))
+			const parsed = parse(result);
+			for (let r of parsed) {
+				expect(r.success, `Failed ${r.index} th testcase: ${r.title}\n${result.stdout}\n${result.stderr}`).to.be.true;
 			}
 		});
 	});
