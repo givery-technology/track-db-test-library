@@ -169,7 +169,7 @@ title: "[制限事項] 生成されるインデックスは4つ以内である"
 
   ```yaml
   precheck:
-    not_empty:
+    one_command:
       - sql/step1.sql
       - sql/step2.sql
   ```
@@ -512,6 +512,26 @@ testcases:
             - name: Karen
               age: 21
               sex: female
+  ```
+
+  `data` には実際に登録するデータを記載します。オブジェクト形式で記載した場合、内部的には `INSERT INTO` + `RETURNING` が 1 回だけ発行されるので、多くの場合に効率よくチェックできます。
+
+  受験者が書いた SQL (`INSERT` 文) で自動採番が使われているかどうかを検証することも可能です。
+  この場合、対象となる SQL ファイルをしていますが、同時に `precheck` / `one_command` の事前検証を強く推奨します。
+
+  ```yaml
+  testcases:
+    - title:
+      exec:
+        - ...
+      precheck:
+        one_command: src/main.sql
+      check:
+        auto_increment:
+          table: my_table
+          column: id
+          data:
+            - src/main.sql
   ```
 
 * `last_sql`
