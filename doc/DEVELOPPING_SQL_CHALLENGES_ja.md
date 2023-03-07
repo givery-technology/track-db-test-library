@@ -606,6 +606,7 @@ testcases:
     * `check`: CHECK 制約違反
     * `not_null`: NOT NULL 制約違反
     * `unique`: UNIQUE 制約違反
+    * `foreign_key`: FOREIGN KEY 制約違反
     * `unknown`: 上記のどれにも該当しないエラー
 
   * `message` には、エラーメッセージを指定できます (省略可)
