@@ -534,6 +534,28 @@ testcases:
             - src/main.sql
   ```
 
+  `expected` を指定すると、受験者が書いた SQL (で追加された最後のレコード) の評価ができます。
+  自動採番対象以外のカラムが評価対象となります。
+
+  ```yaml
+  testcases:
+    - title:
+      exec:
+        - ...
+      precheck:
+        one_command: src/main.sql
+      check:
+        auto_increment:
+          table: my_table
+          column: id
+          data:
+            - src/main.sql
+          expected:
+            name: John
+            age: 21
+            sex: female
+  ```
+
 * `last_sql`
 
   最期に実行された SQL そのものをテストします。

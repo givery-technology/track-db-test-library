@@ -24,6 +24,10 @@ testcases:
         column: id
         data:
           - INSERT INTO my_table (name, age, sex) VALUES ('Karen', 21, 'female');
+        expected:
+          name: Karen
+          age: 21
+          sex: female
   - title: "[ng] should fail for columns without AUTOINCREMENT"
     exec:
       - CREATE TABLE my_table (id INTEGER PRIMARY KEY, name TEXT, age INT, sex TEXT)
