@@ -1,0 +1,13 @@
+testcases:
+  - title: "[ok] default variant `__random__`"
+    exec:
+      - SELECT {{__random__}} AS value
+    check:
+      equal_to:
+        - value: "{{__random__}}"
+  - title: "[ok] default variant `__now__`"
+    exec:
+      - SELECT "{{__now__}}" AS value
+    check:
+      equal_to:
+        - value: "{{__now__}}"

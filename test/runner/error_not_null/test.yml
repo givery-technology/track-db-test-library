@@ -1,0 +1,16 @@
+testcases:
+  - title: "[ok] not null check"
+    exec:
+      - CREATE TABLE users (name TEXT NOT NULL)
+    check:
+      error:
+        sql: INSERT INTO users (name) VALUES (NULL)
+        expected: not_null
+  - title: "[ng] not null check"
+    exec:
+      - CREATE TABLE users (name TEXT)
+    check:
+      error:
+        sql: INSERT INTO users (name) VALUES (NULL)
+        expected: not_null
+ 

@@ -1,0 +1,19 @@
+testcases:
+  - title: "[ok] table structure test"
+    exec:
+      - CREATE TABLE my_table (a INT, b TEXT)
+    table: my_table
+    check:
+      columns: [name]
+      equal_to:
+        - name: a
+        - name: b
+  - title: "[ng] table structure test"
+    exec:
+      - CREATE TABLE my_table (b TEXT, a INT)
+    table: my_table
+    check:
+      columns: [name]
+      equal_to:
+        - name: a
+        - name: b

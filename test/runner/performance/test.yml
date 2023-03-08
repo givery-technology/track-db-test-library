@@ -1,0 +1,31 @@
+testcases:
+  - foreach:
+      - title: "[ok] performance test"
+        limit: 100
+      - title: "[ng] performance test (slow sql)"
+        limit: 1000
+    template:
+      title: "{{title}}"
+      exec:
+        - SELECT 1;
+      check:
+        performance:
+          sql: |-
+            WITH RECURSIVE numbers (x) AS (
+              SELECT 1
+              UNION ALL
+              SELECT x + 1 FROM numbers WHERE x < {{limit}}
+            )
+            SELECT dividends.x AS prime
+            FROM numbers AS dividends, numbers AS divisors
+            WHERE divisors.x <= sqrt (dividends.x)
+            AND dividends.x <> 1
+            GROUP BY dividends.x
+            HAVING sum(
+              CASE
+                WHEN mod(dividends.x, divisors.x) = 0 THEN 1
+                ELSE 0
+              END
+            ) = 1
+            ORDER BY dividends.x;
+          threshold: 30

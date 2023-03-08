@@ -52,6 +52,15 @@ console.log(sql); // EXPLAIN QUERY PLAN SELECT * AS count FROM emp
 
 Loads records from CSV and inserts them into the given table
 
+#### async `Connection#tableSchema(table)`
+
+Queries the table schema.
+
+```javascript
+const columns = await conn.tableSchema("my_table");
+columns.forEach(({order, name, type}) => console.log(name));
+```
+
 ### `records` module
 
 Utility for query result records
@@ -195,7 +204,7 @@ expect([
 ]);
 ``` 
 
-#### `recordEqualToCsv(path, opt_message)
+#### `recordEqualToCsv(path, opt_message)`
 
 Target will be loaded from CSV file.
 
@@ -209,6 +218,28 @@ expect([
 ```csv
 empno,deptno,name
 1,10,Scott
+```
+
+#### `recordContain(value)`
+
+Asserts if the records contain the given value.
+
+```javascript
+expect([
+  { name: "John",  age: 24, sex: "male" },
+  { name: "Karen", age: 21, sex: "female" },
+]).to.recordContain(
+  { name: "John",  age: 24, sex: "male" },
+);
+```
+
+`recordContain` supports function matching.
+
+```javascript
+expect([
+  { name: "John",  age: 24, sex: "male" },
+  { name: "Karen", age: 21, sex: "female" },
+]).to.recordContain(r => r.age === 24);
 ```
 
 #### `columns(xs)`
