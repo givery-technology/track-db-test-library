@@ -26,6 +26,7 @@ This software is released under the [MIT License](LICENSE).
 * [Feat] Multiple test case generation with a simple template engine
 * [Feat] Performance check (Runner)
 * [Feat] Checks for column list (Runner)
+* [Feat] Combine multiple checks into one testcase (Runner)
 
 ### Version 2.4.0
 

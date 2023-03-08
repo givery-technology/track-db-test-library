@@ -736,6 +736,20 @@ testcases:
           data: "{{{data}}}"
 ```
 
+### `all`
+
+複数のテストケースをまとめて 1 つのテストケースにしたいときに使います。
+
+```yaml
+testcases:
+  - title: ...
+    all:
+      - exec: ...
+        check: ...
+      - exec: ...
+        check: ...
+```
+
 ### `debug: false` (任意)
 
 `false` を指定すると、そのテストケースはデバッグ実行 (後述) の対象外となります。
