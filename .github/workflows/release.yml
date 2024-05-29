@@ -1,0 +1,53 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+permissions:
+  contents: write
+jobs:
+  release-npm:
+    name: Release npm package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repository
+        uses: actions/checkout@v3
+      - name: Version check
+        run: |
+          echo Checking version to publish...
+
+          head_hash=$(git rev-parse HEAD)
+          latest_tag=${{ github.ref_name }}
+          latest_tag_hash=$(git rev-parse ${latest_tag})
+
+          if [ "${head_hash}" != "${latest_tag_hash}" ]; then
+            echo "HEAD is not at the latest tag (${latest_tag})"
+            exit 1
+          fi
+
+          package_version=$(cat package.json | grep version | awk -F'"' '{ print "v" $4; }')
+
+          if [ "${latest_tag}" != "${package_version}" ]; then
+            echo "Latest tag (${latest_tag}) does not match package version (${package_version})"
+            exit 2
+          fi
+
+          echo "Package version: ${package_version}"
+      - name: Publish npm package
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          pre_release=$(echo ${{ github.ref_name }} | awk -F'-' '{ print $2 }')
+          if [ "${pre_release}" = "" ]; then
+            npm publish --access public
+          else
+            npm publish --access public --tag beta
+          fi
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            tag_name: ${{ github.ref }}
+            release_name: Release ${{ github.ref_name }}
+            draft: false
+            prerelease: ${{ contains(github.ref_name, '-') }}
