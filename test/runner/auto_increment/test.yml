@@ -1,0 +1,55 @@
+testcases:
+  - title: "[ok] should success for columns with AUTOINCREMENT"
+    exec:
+      - CREATE TABLE my_table (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INT, sex TEXT)
+      - INSERT INTO my_table (name, age, sex) VALUES ('Joe', 30, 'male')
+    check:
+      auto_increment:
+        table: my_table
+        column: id
+        data:
+          - name: John
+            age: 24
+            sex: male
+          - name: Karen
+            age: 21
+            sex: female
+  - title: "[ok] should success for columns with AUTOINCREMENT (direct SQL mode)"
+    exec:
+      - CREATE TABLE my_table (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INT, sex TEXT)
+      - INSERT INTO my_table (name, age, sex) VALUES ('Joe', 30, 'male')
+    check:
+      auto_increment:
+        table: my_table
+        column: id
+        data:
+          - INSERT INTO my_table (name, age, sex) VALUES ('Karen', 21, 'female');
+        expected:
+          name: Karen
+          age: 21
+          sex: female
+  - title: "[ng] should fail for columns without AUTOINCREMENT"
+    exec:
+      - CREATE TABLE my_table (id INTEGER PRIMARY KEY, name TEXT, age INT, sex TEXT)
+      - INSERT INTO my_table (name, age, sex) VALUES ('Joe', 30, 'male')
+    check:
+      auto_increment:
+        table: my_table
+        column: id
+        data:
+          - name: John
+            age: 24
+            sex: male
+          - name: Karen
+            age: 21
+            sex: female
+  - title: "[ng] should success for columns with AUTOINCREMENT (direct SQL mode)"
+    exec:
+      - CREATE TABLE my_table (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INT, sex TEXT)
+      - INSERT INTO my_table (name, age, sex) VALUES ('Joe', 30, 'male')
+    check:
+      auto_increment:
+        table: my_table
+        column: id
+        data:
+          - INSERT INTO my_table (id, name, age, sex) VALUES (2, 'Karen', 21, 'female');

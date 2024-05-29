@@ -1,0 +1,4 @@
+{
+	"description": "`contain` with array fails for invalid testcases",
+	"success": true
+}
