@@ -40,8 +40,8 @@
     "fs-mktemp": "^1.1.3",
     "glob": "^8.1.0",
     "glob-parent": ">=5.1.2",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-custom-filter": "^0.4.3",
-    "gulp-mocha": "^8.0.0"
+    "gulp-mocha": "^10.0.1"
   }
 }
