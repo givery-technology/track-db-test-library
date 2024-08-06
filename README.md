@@ -15,6 +15,10 @@ This software is released under the [MIT License](LICENSE).
 
 ## Release Note
 
+### Version 2.6.0
+
+* [Feat] MySQL support
+
 ### Version 2.5.0
 
 * [Feat] Allow multiple checks in a single testcase (Runner)
