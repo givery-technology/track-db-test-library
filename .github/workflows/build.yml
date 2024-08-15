@@ -23,3 +23,13 @@ jobs:
         npm test
       env:
         CI: true
+  integration_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: npm ci
+      - name: Integration test with MySQL image
+        uses: docker://givery/track-mysql:2.3.2
+        with:
+          entrypoint: mocha
+          args: integration_test/mysql.test.js
