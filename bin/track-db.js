@@ -27,7 +27,7 @@ Usage:
 
 Options:
   --clean                Remove all objects before execution.
-  -c --client <client>   Kind of Database Client [sqlite, postgres; default sqlite]
+  -c --client <client>   Kind of Database Client [sqlite, postgres, mysql; default sqlite]
   -r --result <result>   Which results will be displayed [last, full; default last]
   -l --limit <limit>     Maximum row count that will be displayed [default 10]
 `;
