@@ -8,7 +8,7 @@
 * `track-db-test-library`
 
 ```sh
-$ npm install -g track-test-utiility track-db-test-library
+$ npm install -g track-test-utility track-db-test-library
 ```
 
 `track-db-test-library` からは、以下の 2 つのコマンドが利用できるようになります。
@@ -29,7 +29,7 @@ $ track-test generate <ディレクトリ> sql
 ## テストケースの作成
 
 * 公開テストケース: `test/test.public.yml`
-* 非公開テストケース: `test/test.public.yml`
+* 非公開テストケース: `test/test.secret.yml`
 
 にそれぞれ記述します。
 
@@ -808,7 +808,7 @@ testcases:
 
 ## track.yml への反映
 
-`test/test.public.yml`、`test/test.public.yml` のテストケースの内容をもとに、
+`test/test.public.yml`、`test/test.secret.yml` のテストケースの内容をもとに、
 
 * テストケース数
 * デバッグ実行
