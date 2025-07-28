@@ -41,6 +41,7 @@ preparations:
     - init/hotels.csv:hotels
     - init/rooms.csv:rooms
     - sql/answer.sql
+client: sqlite  # データベースクライアントの指定（任意）
 testcases:
   - title:
       ja: "[制限事項] 生成されるインデックスは4つ以内で、5カラム以内である"
@@ -73,6 +74,20 @@ testcases:
       - survey/slowquery.sql
     check:
       no_fullscan: true
+```
+
+### `client` (任意)
+
+データベースクライアントを指定します。デフォルトは `sqlite` です。
+
+利用可能な値:
+- `sqlite` (デフォルト)
+- `postgres`
+- `mysql`
+
+例：
+```yaml
+client: postgres
 ```
 
 ### `preparations` (任意)
