@@ -8,7 +8,7 @@
 * `track-db-test-library`
 
 ```sh
-$ npm install -g track-test-utiility track-db-test-library
+$ npm install -g track-test-utility track-db-test-library
 ```
 
 `track-db-test-library` からは、以下の 2 つのコマンドが利用できるようになります。
@@ -29,7 +29,7 @@ $ track-test generate <ディレクトリ> sql
 ## テストケースの作成
 
 * 公開テストケース: `test/test.public.yml`
-* 非公開テストケース: `test/test.public.yml`
+* 非公開テストケース: `test/test.secret.yml`
 
 にそれぞれ記述します。
 
@@ -41,6 +41,7 @@ preparations:
     - init/hotels.csv:hotels
     - init/rooms.csv:rooms
     - sql/answer.sql
+client: sqlite  # データベースクライアントの指定（任意）
 testcases:
   - title:
       ja: "[制限事項] 生成されるインデックスは4つ以内で、5カラム以内である"
@@ -73,6 +74,20 @@ testcases:
       - survey/slowquery.sql
     check:
       no_fullscan: true
+```
+
+### `client` (任意)
+
+データベースクライアントを指定します。デフォルトは `sqlite` です。
+
+利用可能な値:
+- `sqlite` (デフォルト)
+- `postgres`
+- `mysql`
+
+例：
+```yaml
+client: postgres
 ```
 
 ### `preparations` (任意)
@@ -116,6 +131,7 @@ testcases:
       <実行する SQL・CSV リスト>
     check:
       <チェック項目>
+    timeout: <タイムアウト時間（ミリ秒）>
 ```
 
 テストケースには、チェック項目 (`check`) の内容によっておおきく **通常テストケース** と **特殊テストケース** の2つに大別されます。
@@ -143,6 +159,26 @@ OK 例:
 
 ```yaml
 title: "[制限事項] 生成されるインデックスは4つ以内である"
+```
+
+#### `timeout` (任意)
+
+テストケースのタイムアウト時間を設定します。
+
+実際のタイムアウト時間は、Mocha のデフォルトタイムアウト（2000ms）+ 設定値となります。
+
+例：
+- `timeout: 6000` → 実際のタイムアウトは 8 秒
+- `timeout: -500` → 実際のタイムアウトは 1.5 秒（負の値でデフォルトより短く設定可能）
+
+```yaml
+testcases:
+  - title: "重い処理のテスト"
+    exec:
+      - heavy_query.sql
+    check:
+      equal_to: expected.csv
+    timeout: 10000  # 12秒のタイムアウト
 ```
 
 #### `precheck` (任意)
@@ -480,15 +516,31 @@ testcases:
     指定すると、そのテーブルに関するインデックスのみにチェック対象を絞ります。
     未指定の場合、全テーブルのインデックスを対象とします。
 
+    **注意**: テーブル名はダブルクォーテーションとシングルクォーテーションで囲む必要があります。
+
+    ```yaml
+    check:
+      index:
+        table: "'sports'"  # ダブルクォーテーションとシングルクォーテーションで囲む
+        total:
+          ge: 1
+    ```
+
   * `total`
 
     特定テーブル、もしくは全テーブルに関するインデックス数の範囲をチェックします。
-    `ge` (指定数より多い)、`gt` (指定数以上)、`le` (指定数より少ない)、`lt` (指定数以下) を組み合わせます。
+    * `ge` (指定数以上)
+    * `gt` (指定数より多い)
+    * `le` (指定数以下)
+    * `lt` (指定数より少ない)
 
   * `column`
 
     特定テーブル、もしくは全テーブルに関するインデックスで対象となったカラム数の範囲をチェックします。
-    `ge` (指定数より多い)、`gt` (指定数以上)、`le` (指定数より少ない)、`lt` (指定数以下) を組み合わせます。
+    * `ge` (指定数以上)
+    * `gt` (指定数より多い)
+    * `le` (指定数以下)
+    * `lt` (指定数より少ない)
 
 * `auto_increment`
 
@@ -756,7 +808,7 @@ testcases:
 
 ## track.yml への反映
 
-`test/test.public.yml`、`test/test.public.yml` のテストケースの内容をもとに、
+`test/test.public.yml`、`test/test.secret.yml` のテストケースの内容をもとに、
 
 * テストケース数
 * デバッグ実行
