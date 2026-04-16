@@ -371,7 +371,7 @@ export class Connection {
       options = tx;
       tx = null;
     }
-    const dbfile = (options || {}).file || ':memory:';
+    const dbfile = (options || {}).file || 'db.sqlite';
     if (options && options.clean) {
       try {
         fs.unlinkSync(dbfile);
