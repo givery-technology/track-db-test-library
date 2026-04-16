@@ -302,6 +302,70 @@ async function checkPerformance(conn: Connection, check: any): Promise<void> {
   expect(end - start, messageOf()).at.most(Number(check.threshold) || 200);
 }
 
+function applyYamlSettings(yaml: any): void {
+  const settings = yaml.settings ?? {};
+  const max_display_rows = settings.max_display_rows;
+  if (max_display_rows === 'unlimited') {
+    assertions.options.limit = Infinity;
+  } else if (isFinite(max_display_rows)) {
+    assertions.options.limit = Number(max_display_rows);
+  }
+}
+
+async function executeTestcase(client: string | undefined, testcase: any): Promise<void> {
+  async function doTest(tc: any): Promise<void> {
+    let conn: Connection | undefined;
+    try {
+      conn = await Connection.new({ client, clean: true, file: ':memory:' });
+      if (!!tc.precheck) {
+        await precheck(conn, tc.precheck);
+      }
+
+      let { records: recs, sql } = (await conn.queryAll((tc.exec || []).flat())).slice(-1)[0];
+      let asTable: string | undefined;
+
+      if (tc.table && (typeof tc.table === 'string' || tc.table instanceof String)) {
+        sql = '';
+        recs = await conn.tableSchema(tc.table);
+        asTable = tc.table;
+      }
+
+      const checks = tc.check.length ? tc.check : [tc.check];
+      for (let check of checks) {
+        if (check.ecma) {
+          await checkEcma(conn, check.ecma);
+        } else if (check.no_fullscan) {
+          await checkNoFullscan(conn, sql);
+        } else if (check.last_sql) {
+          await checkLastSql(conn, check.last_sql, sql.trim());
+        } else if (check.index) {
+          await checkIndex(conn, check);
+        } else if (check.auto_increment) {
+          await checkAutoIncrement(conn, check.auto_increment);
+        } else if (check.error) {
+          await checkError(conn, check.error);
+        } else if (check.performance) {
+          await checkPerformance(conn, check.performance);
+        } else {
+          await checkLastQuery(conn, check, recs, asTable);
+        }
+      }
+    } finally {
+      if (conn) {
+        await conn.close();
+      }
+    }
+  }
+
+  if (!!testcase.all) {
+    for (let tc of testcase.all) {
+      await doTest(tc);
+    }
+  } else {
+    await doTest(testcase);
+  }
+}
+
 function preprocess(testcase: any): any[] {
   const now = new Date().toISOString();
   function buildProps(props: any, defaults?: any): any {
@@ -354,61 +418,11 @@ export class TestRunner {
   }
 
   run(testcase: any): void {
-    const self = this;
+    const client = this.yaml.client;
     describe("", function() {
-      this.timeout(Connection.timeout(self.yaml.client, testcase.timeout));
+      this.timeout(Connection.timeout(client, testcase.timeout));
       it(__(testcase.title) || '', async () => {
-        async function doTest(tc: any): Promise<void> {
-          let conn: Connection | undefined;
-          try {
-            conn = await Connection.new({ client: self.yaml.client, clean: true, file: ':memory:' });
-            if (!!tc.precheck) {
-              await precheck(conn, tc.precheck);
-            }
-
-            let { records: recs, sql } = (await conn.queryAll((tc.exec || []).flat())).slice(-1)[0];
-            let asTable: string | undefined;
-
-            if (tc.table && (typeof tc.table === 'string' || tc.table instanceof String)) {
-              sql = '';
-              recs = await conn.tableSchema(tc.table);
-              asTable = tc.table;
-            }
-
-            const checks = tc.check.length ? tc.check : [tc.check];
-            for (let check of checks) {
-              if (check.ecma) {
-                await checkEcma(conn, check.ecma);
-              } else if (check.no_fullscan) {
-                await checkNoFullscan(conn, sql);
-              } else if (check.last_sql) {
-                await checkLastSql(conn, check.last_sql, sql.trim());
-              } else if (check.index) {
-                await checkIndex(conn, check);
-              } else if (check.auto_increment) {
-                await checkAutoIncrement(conn, check.auto_increment);
-              } else if (check.error) {
-                await checkError(conn, check.error);
-              } else if (check.performance) {
-                await checkPerformance(conn, check.performance);
-              } else {
-                await checkLastQuery(conn, check, recs, asTable);
-              }
-            }
-          } finally {
-            if (conn) {
-              await conn.close();
-            }
-          }
-        }
-
-        if (!!testcase.all) {
-          for (let tc of testcase.all) {
-            await doTest(tc);
-          }
-        } else {
-          await doTest(testcase);
-        }
+        await executeTestcase(client, testcase);
       });
     });
   }

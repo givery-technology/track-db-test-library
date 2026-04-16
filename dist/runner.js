@@ -298,6 +298,75 @@ async function checkPerformance(conn, check) {
     const end = perf_hooks_1.performance.now();
     expect(end - start, messageOf()).at.most(Number(check.threshold) || 200);
 }
+function applyYamlSettings(yaml) {
+    var _a;
+    const settings = (_a = yaml.settings) !== null && _a !== void 0 ? _a : {};
+    const max_display_rows = settings.max_display_rows;
+    if (max_display_rows === 'unlimited') {
+        assertions_1.default.options.limit = Infinity;
+    }
+    else if (isFinite(max_display_rows)) {
+        assertions_1.default.options.limit = Number(max_display_rows);
+    }
+}
+async function executeTestcase(client, testcase) {
+    async function doTest(tc) {
+        let conn;
+        try {
+            conn = await connection_1.Connection.new({ client, clean: true, file: ':memory:' });
+            if (!!tc.precheck) {
+                await precheck(conn, tc.precheck);
+            }
+            let { records: recs, sql } = (await conn.queryAll((tc.exec || []).flat())).slice(-1)[0];
+            let asTable;
+            if (tc.table && (typeof tc.table === 'string' || tc.table instanceof String)) {
+                sql = '';
+                recs = await conn.tableSchema(tc.table);
+                asTable = tc.table;
+            }
+            const checks = tc.check.length ? tc.check : [tc.check];
+            for (let check of checks) {
+                if (check.ecma) {
+                    await checkEcma(conn, check.ecma);
+                }
+                else if (check.no_fullscan) {
+                    await checkNoFullscan(conn, sql);
+                }
+                else if (check.last_sql) {
+                    await checkLastSql(conn, check.last_sql, sql.trim());
+                }
+                else if (check.index) {
+                    await checkIndex(conn, check);
+                }
+                else if (check.auto_increment) {
+                    await checkAutoIncrement(conn, check.auto_increment);
+                }
+                else if (check.error) {
+                    await checkError(conn, check.error);
+                }
+                else if (check.performance) {
+                    await checkPerformance(conn, check.performance);
+                }
+                else {
+                    await checkLastQuery(conn, check, recs, asTable);
+                }
+            }
+        }
+        finally {
+            if (conn) {
+                await conn.close();
+            }
+        }
+    }
+    if (!!testcase.all) {
+        for (let tc of testcase.all) {
+            await doTest(tc);
+        }
+    }
+    else {
+        await doTest(testcase);
+    }
+}
 function preprocess(testcase) {
     const now = new Date().toISOString();
     function buildProps(props, defaults) {
@@ -346,66 +415,11 @@ class TestRunner {
         }
     }
     run(testcase) {
-        const self = this;
+        const client = this.yaml.client;
         describe("", function () {
-            this.timeout(connection_1.Connection.timeout(self.yaml.client, testcase.timeout));
+            this.timeout(connection_1.Connection.timeout(client, testcase.timeout));
             it((0, i18n_1.message)(testcase.title) || '', async () => {
-                async function doTest(tc) {
-                    let conn;
-                    try {
-                        conn = await connection_1.Connection.new({ client: self.yaml.client, clean: true, file: ':memory:' });
-                        if (!!tc.precheck) {
-                            await precheck(conn, tc.precheck);
-                        }
-                        let { records: recs, sql } = (await conn.queryAll((tc.exec || []).flat())).slice(-1)[0];
-                        let asTable;
-                        if (tc.table && (typeof tc.table === 'string' || tc.table instanceof String)) {
-                            sql = '';
-                            recs = await conn.tableSchema(tc.table);
-                            asTable = tc.table;
-                        }
-                        const checks = tc.check.length ? tc.check : [tc.check];
-                        for (let check of checks) {
-                            if (check.ecma) {
-                                await checkEcma(conn, check.ecma);
-                            }
-                            else if (check.no_fullscan) {
-                                await checkNoFullscan(conn, sql);
-                            }
-                            else if (check.last_sql) {
-                                await checkLastSql(conn, check.last_sql, sql.trim());
-                            }
-                            else if (check.index) {
-                                await checkIndex(conn, check);
-                            }
-                            else if (check.auto_increment) {
-                                await checkAutoIncrement(conn, check.auto_increment);
-                            }
-                            else if (check.error) {
-                                await checkError(conn, check.error);
-                            }
-                            else if (check.performance) {
-                                await checkPerformance(conn, check.performance);
-                            }
-                            else {
-                                await checkLastQuery(conn, check, recs, asTable);
-                            }
-                        }
-                    }
-                    finally {
-                        if (conn) {
-                            await conn.close();
-                        }
-                    }
-                }
-                if (!!testcase.all) {
-                    for (let tc of testcase.all) {
-                        await doTest(tc);
-                    }
-                }
-                else {
-                    await doTest(testcase);
-                }
+                await executeTestcase(client, testcase);
             });
         });
     }
