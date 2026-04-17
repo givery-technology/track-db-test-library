@@ -18,5 +18,10 @@ export declare class TestRunner {
     constructor(lang: string, yaml: string | any);
     runAll(): void;
     run(testcase: any): void;
+    getTestcases(): Array<{
+        title: string;
+        fn: () => Promise<void>;
+        timeout: number;
+    }>;
 }
 export default TestRunner;

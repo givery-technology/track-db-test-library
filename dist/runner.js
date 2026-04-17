@@ -423,6 +423,28 @@ class TestRunner {
             });
         });
     }
+    getTestcases() {
+        var _a;
+        const settings = (_a = this.yaml.settings) !== null && _a !== void 0 ? _a : {};
+        const max_display_rows = settings.max_display_rows;
+        if (max_display_rows === 'unlimited') {
+            assertions_1.default.options.limit = Infinity;
+        }
+        else if (isFinite(max_display_rows)) {
+            assertions_1.default.options.limit = Number(max_display_rows);
+        }
+        const result = [];
+        for (const testcase of this.yaml.testcases) {
+            preprocess(testcase).forEach((tc) => {
+                result.push({
+                    title: (0, i18n_1.message)(tc.title) || '',
+                    fn: async () => { await executeTestcase(this.yaml.client, tc); },
+                    timeout: connection_1.Connection.timeout(this.yaml.client, tc.timeout),
+                });
+            });
+        }
+        return result;
+    }
 }
 exports.TestRunner = TestRunner;
 function indent(str, n = 2) {

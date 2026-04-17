@@ -426,6 +426,29 @@ export class TestRunner {
       });
     });
   }
+
+  getTestcases(): Array<{ title: string; fn: () => Promise<void>; timeout: number }> {
+    const settings = this.yaml.settings ?? {};
+    const max_display_rows = settings.max_display_rows;
+    if (max_display_rows === 'unlimited') {
+      assertions.options.limit = Infinity;
+    } else if (isFinite(max_display_rows)) {
+      assertions.options.limit = Number(max_display_rows);
+    }
+
+    const result: Array<{ title: string; fn: () => Promise<void>; timeout: number }> = [];
+    for (const testcase of this.yaml.testcases) {
+      preprocess(testcase).forEach((tc: any) => {
+        result.push({
+          title: __(tc.title) || '',
+          fn: async () => { await executeTestcase(this.yaml.client, tc); },
+          timeout: Connection.timeout(this.yaml.client, tc.timeout),
+        });
+      });
+    }
+    return result;
+  }
+
 }
 
 function indent(str: string, n: number = 2): string {
